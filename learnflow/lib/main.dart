@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'pages/SplashScreen.dart';
+import 'pages/OnboardingScreen.dart';
 import 'pages/LoginPage.dart';
 import 'pages/RegisterPage.dart';
 import 'pages/ForgotPasswordPage.dart';
@@ -15,10 +17,12 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'LearnFlow',
-      initialRoute: '/',
+      initialRoute: '/splash',
       routes: {
-        '/': (context) => const LoginPage(),
-        '/register': (context) => const RegisterPage(),
+        '/splash':          (context) => const SplashScreen(),
+        '/onboarding':      (context) => const OnboardingScreen(),
+        '/':                (context) => const LoginPage(),
+        '/register':        (context) => const RegisterPage(),
         '/forgot-password': (context) => const ForgotPasswordPage(),
       },
     );
