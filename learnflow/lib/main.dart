@@ -17,7 +17,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'LearnFlow',
-      initialRoute: '/splash',         // เริ่มที่ Splash ก่อนเสมอ
+      initialRoute: '/splash',
       routes: {
         '/splash':          (context) => const SplashScreen(),
         '/onboarding':      (context) => const OnboardingScreen(),

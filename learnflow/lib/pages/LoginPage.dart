@@ -14,11 +14,10 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[200],
+      backgroundColor: Colors.white,
       body: SingleChildScrollView(
         child: Column(
           children: [
-            // Header
             // Header
             Container(
               width: double.infinity,
@@ -29,18 +28,21 @@ class _LoginPageState extends State<LoginPage> {
                 bottom: 30,
               ),
               decoration: const BoxDecoration(color: Color(0xFF1DBA78)),
-              child: const Column(
-                crossAxisAlignment:
-                    CrossAxisAlignment.start, // 👈 เปลี่ยนตรงนี้
+              child: Column(                              // ลบ const ออก เพราะมี Image.asset
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Icon(Icons.menu_book, color: Colors.white, size: 60),
-                  SizedBox(height: 6),
-                  Text(
+                  Image.asset(
+                    'assets/images/LeranFlow_logo.png',
+                    width: 80,
+                    height: 80,
+                  ),
+                  const SizedBox(height: 6),
+                  const Text(
                     "LearnFlow",
                     style: TextStyle(color: Colors.white, fontSize: 14),
                   ),
-                  SizedBox(height: 20),
-                  Text(
+                  const SizedBox(height: 20),
+                  const Text(
                     "Get Started now",
                     style: TextStyle(
                       fontSize: 28,
@@ -48,8 +50,8 @@ class _LoginPageState extends State<LoginPage> {
                       color: Colors.white,
                     ),
                   ),
-                  SizedBox(height: 6),
-                  Text(
+                  const SizedBox(height: 6),
+                  const Text(
                     "Create an account or log in to explore about our app",
                     style: TextStyle(color: Colors.white70, fontSize: 13),
                   ),
@@ -111,7 +113,7 @@ class _LoginPageState extends State<LoginPage> {
 
                   const SizedBox(height: 24),
 
-                  // Email label + field
+                  // Email
                   const Text(
                     "Email",
                     style: TextStyle(fontSize: 14, color: Colors.black87),
@@ -141,7 +143,7 @@ class _LoginPageState extends State<LoginPage> {
 
                   const SizedBox(height: 16),
 
-                  // Password label + field
+                  // Password
                   const Text(
                     "Password",
                     style: TextStyle(fontSize: 14, color: Colors.black87),
@@ -218,7 +220,9 @@ class _LoginPageState extends State<LoginPage> {
                         ],
                       ),
                       TextButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          Navigator.pushNamed(context, '/forgot-password');
+                        },
                         style: TextButton.styleFrom(
                           padding: EdgeInsets.zero,
                           minimumSize: Size.zero,
@@ -297,7 +301,6 @@ class _LoginPageState extends State<LoginPage> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          // Google "G" icon using colored text as placeholder
                           Container(
                             width: 22,
                             height: 22,
@@ -319,54 +322,6 @@ class _LoginPageState extends State<LoginPage> {
                           const SizedBox(width: 10),
                           const Text(
                             "Continue with Google",
-                            style: TextStyle(
-                              color: Colors.black87,
-                              fontSize: 14,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-
-                  const SizedBox(height: 12),
-
-                  // Continue with Facebook
-                  SizedBox(
-                    width: double.infinity,
-                    child: OutlinedButton(
-                      style: OutlinedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 13),
-                        side: BorderSide(color: Colors.grey[300]!),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                      ),
-                      onPressed: () {},
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Container(
-                            width: 22,
-                            height: 22,
-                            decoration: const BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: Color(0xFF1877F2),
-                            ),
-                            child: const Center(
-                              child: Text(
-                                "f",
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 14,
-                                  color: Colors.white,
-                                ),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 10),
-                          const Text(
-                            "Continue with Facebook",
                             style: TextStyle(
                               color: Colors.black87,
                               fontSize: 14,
