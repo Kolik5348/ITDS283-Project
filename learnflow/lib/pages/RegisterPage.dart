@@ -170,14 +170,14 @@ class _RegisterPageState extends State<RegisterPage> {
 
                   const SizedBox(height: 16),
 
-                  // Phone Number
+                  // Phone Number (ไทย +66)
                   const Text("Phone Number",
                       style: TextStyle(fontSize: 13, color: Colors.black87)),
                   const SizedBox(height: 6),
                   TextField(
                     keyboardType: TextInputType.phone,
                     decoration: InputDecoration(
-                      hintText: "(454) 726-0592",
+                      hintText: "08X-XXX-XXXX",
                       hintStyle: const TextStyle(color: Colors.black45),
                       filled: true,
                       fillColor: Colors.white,
@@ -188,23 +188,34 @@ class _RegisterPageState extends State<RegisterPage> {
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            // Flag placeholder (Thai flag colors)
-                            Container(
-                              width: 24,
-                              height: 16,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(2),
-                                color: Colors.red[700],
-                              ),
-                              child: Column(
-                                children: [
-                                  Container(height: 5, color: Colors.red[700]),
-                                  Container(height: 6, color: Colors.white),
-                                  Container(height: 5, color: Colors.red[700]),
-                                ],
+                            // ธงไทย (แดง-ขาว-น้ำเงิน-ขาว-แดง)
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(2),
+                              child: SizedBox(
+                                width: 26,
+                                height: 18,
+                                child: Column(
+                                  children: [
+                                    Expanded(flex: 1, child: Container(color: const Color(0xFFB80000))),
+                                    Expanded(flex: 1, child: Container(color: Colors.white)),
+                                    Expanded(flex: 2, child: Container(color: const Color(0xFF002868))),
+                                    Expanded(flex: 1, child: Container(color: Colors.white)),
+                                    Expanded(flex: 1, child: Container(color: const Color(0xFFB80000))),
+                                  ],
+                                ),
                               ),
                             ),
-                            const SizedBox(width: 4),
+                            const SizedBox(width: 6),
+                            // รหัสประเทศไทย
+                            const Text(
+                              "+66",
+                              style: TextStyle(
+                                fontSize: 13,
+                                color: Colors.black87,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            const SizedBox(width: 2),
                             const Icon(Icons.keyboard_arrow_down,
                                 size: 16, color: Colors.black54),
                           ],
@@ -288,6 +299,74 @@ class _RegisterPageState extends State<RegisterPage> {
                             fontSize: 16,
                             color: Colors.white,
                             fontWeight: FontWeight.w600),
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 16),
+
+                  // Or divider
+                  Row(
+                    children: [
+                      Expanded(child: Divider(color: Colors.grey[300])),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 12),
+                        child: Text(
+                          "Or",
+                          style: TextStyle(
+                            color: Colors.grey[500],
+                            fontSize: 13,
+                          ),
+                        ),
+                      ),
+                      Expanded(child: Divider(color: Colors.grey[300])),
+                    ],
+                  ),
+
+                  const SizedBox(height: 16),
+
+                  // Continue with Google
+                  SizedBox(
+                    width: double.infinity,
+                    child: OutlinedButton(
+                      style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 13),
+                        side: BorderSide(color: Colors.grey[300]!),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                      onPressed: () {},
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Container(
+                            width: 22,
+                            height: 22,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              border: Border.all(color: Colors.grey[300]!),
+                            ),
+                            child: const Center(
+                              child: Text(
+                                "G",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 14,
+                                  color: Color(0xFF4285F4),
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 10),
+                          const Text(
+                            "Continue with Google",
+                            style: TextStyle(
+                              color: Colors.black87,
+                              fontSize: 14,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ),
