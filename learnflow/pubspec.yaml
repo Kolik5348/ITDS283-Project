@@ -21,4 +21,6 @@ flutter:
   uses-material-design: true
   assets:
     - assets/images/LeranFlow_logo.png
-    - assets/images/Img_Onboarding.webp
+    - assets/images/Img Onboarding.webp
+    - assets/images/Img Onboarding2.webp
+    - assets/images/Img Onboarding3.webp

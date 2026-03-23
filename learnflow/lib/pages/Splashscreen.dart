@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'package:flutter/material.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -8,39 +9,18 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen>
-    with TickerProviderStateMixin {
-  // Animation controllers
+    with SingleTickerProviderStateMixin {
   late AnimationController _logoController;
-  late AnimationController _textController;
-  late AnimationController _taglineController;
-
-  // Logo animations
   late Animation<double> _logoScale;
   late Animation<double> _logoFade;
-
-  // Title animation
-  late Animation<double> _titleFade;
-  late Animation<Offset> _titleSlide;
-
-  // Tagline animation
-  late Animation<double> _taglineFade;
-  late Animation<Offset> _taglineSlide;
-
-  // Loading bar
-  double _loadingProgress = 0.0;
 
   @override
   void initState() {
     super.initState();
-    _setupAnimations();
-    _startSequence();
-  }
 
-  void _setupAnimations() {
-    // Logo — scale + fade
     _logoController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 700),
+      duration: const Duration(milliseconds: 800),
     );
     _logoScale = Tween<double>(begin: 0.5, end: 1.0).animate(
       CurvedAnimation(parent: _logoController, curve: Curves.elasticOut),
@@ -50,70 +30,12 @@ class _SplashScreenState extends State<SplashScreen>
       curve: Curves.easeIn,
     );
 
-    // Title — fade + slide
-    _textController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 600),
-    );
-    _titleFade = CurvedAnimation(
-      parent: _textController,
-      curve: Curves.easeIn,
-    );
-    _titleSlide = Tween<Offset>(
-      begin: const Offset(0, 0.3),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: _textController,
-      curve: Curves.easeOut,
-    ));
-
-    // Tagline — fade + slide
-    _taglineController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 600),
-    );
-    _taglineFade = CurvedAnimation(
-      parent: _taglineController,
-      curve: Curves.easeIn,
-    );
-    _taglineSlide = Tween<Offset>(
-      begin: const Offset(0, 0.4),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: _taglineController,
-      curve: Curves.easeOut,
-    ));
-  }
-
-  void _startSequence() async {
-    // 1. Logo animate
-    await Future.delayed(const Duration(milliseconds: 200));
     _logoController.forward();
-
-    // 2. Title animate
-    await Future.delayed(const Duration(milliseconds: 400));
-    _textController.forward();
-
-    // 3. Tagline animate
-    await Future.delayed(const Duration(milliseconds: 300));
-    _taglineController.forward();
-
-    // 4. Loading bar เริ่มหลัง animation เสร็จ
-    await Future.delayed(const Duration(milliseconds: 200));
-    _startLoading();
+    _navigateToOnboarding();
   }
 
-  void _startLoading() async {
-    for (int i = 0; i <= 100; i += 2) {
-      await Future.delayed(const Duration(milliseconds: 40));
-      if (mounted) {
-        setState(() {
-          _loadingProgress = i / 100;
-        });
-      }
-    }
-
-    await Future.delayed(const Duration(milliseconds: 300));
+  void _navigateToOnboarding() async {
+    await Future.delayed(const Duration(seconds: 3));
     if (mounted) {
       Navigator.pushReplacementNamed(context, '/onboarding');
     }
@@ -122,8 +44,6 @@ class _SplashScreenState extends State<SplashScreen>
   @override
   void dispose() {
     _logoController.dispose();
-    _textController.dispose();
-    _taglineController.dispose();
     super.dispose();
   }
 
@@ -133,8 +53,6 @@ class _SplashScreenState extends State<SplashScreen>
       body: Container(
         width: double.infinity,
         height: double.infinity,
-
-        // Gradient พื้นหลัง
         decoration: const BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topLeft,
@@ -146,131 +64,115 @@ class _SplashScreenState extends State<SplashScreen>
             ],
           ),
         ),
-
-        child: SafeArea(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Spacer(flex: 2),
-
-              // Logo animation
-              ScaleTransition(
-                scale: _logoScale,
-                child: FadeTransition(
-                  opacity: _logoFade,
-                  child: Container(
-                    width: 110,
-                    height: 110,
-                    decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.15),
-                      borderRadius: BorderRadius.circular(28),
-                    ),
-                    padding: const EdgeInsets.all(16),
-                    child: Image.asset(
-                      'assets/images/LeranFlow_logo.png',
-                      fit: BoxFit.contain,
-                    ),
+        child: Center(
+          child: ScaleTransition(
+            scale: _logoScale,
+            child: FadeTransition(
+              opacity: _logoFade,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Logo ใหญ่
+                  Image.asset(
+                    'assets/images/LeranFlow_logo.png',
+                    width: 220,
+                    height: 220,
+                    fit: BoxFit.contain,
                   ),
-                ),
-              ),
 
-              const SizedBox(height: 24),
+                  const SizedBox(height: 24),
 
-              // ชื่อแอป animation
-              SlideTransition(
-                position: _titleSlide,
-                child: FadeTransition(
-                  opacity: _titleFade,
-                  child: const Text(
-                    "LearnFlow",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 36,
-                      fontWeight: FontWeight.bold,
-                      letterSpacing: 1.5,
-                    ),
+                  // Spinner อยู่ใต้โลโก้
+                  const SizedBox(
+                    width: 52,
+                    height: 52,
+                    child: _GradientSpinner(),
                   ),
-                ),
+                ],
               ),
-
-              const SizedBox(height: 8),
-
-              // Tagline animation
-              SlideTransition(
-                position: _taglineSlide,
-                child: FadeTransition(
-                  opacity: _taglineFade,
-                  child: const Text(
-                    "Learn Smarter, Not Harder",
-                    style: TextStyle(
-                      color: Colors.white70,
-                      fontSize: 14,
-                      letterSpacing: 0.5,
-                    ),
-                  ),
-                ),
-              ),
-
-              const Spacer(flex: 2),
-
-              // Loading bar
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 50),
-                child: Column(
-                  children: [
-                    // Loading bar custom
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(10),
-                      child: Stack(
-                        children: [
-                          // พื้นหลัง bar
-                          Container(
-                            height: 5,
-                            width: double.infinity,
-                            color: Colors.white24,
-                          ),
-                          // Progress bar
-                          AnimatedContainer(
-                            duration: const Duration(milliseconds: 40),
-                            height: 5,
-                            width: MediaQuery.of(context).size.width *
-                                _loadingProgress *
-                                0.72, // 0.72 = คิดจาก padding 50*2
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(10),
-                              color: Colors.white,
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.white.withOpacity(0.6),
-                                  blurRadius: 6,
-                                  spreadRadius: 1,
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-
-                    const SizedBox(height: 10),
-
-                    // เปอร์เซ็นต์
-                    Text(
-                      "${(_loadingProgress * 100).toInt()}%",
-                      style: const TextStyle(
-                        color: Colors.white60,
-                        fontSize: 12,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-              const SizedBox(height: 40),
-            ],
+            ),
           ),
         ),
       ),
     );
   }
+}
+
+// ===== Gradient Spinner =====
+
+class _GradientSpinner extends StatefulWidget {
+  const _GradientSpinner();
+
+  @override
+  State<_GradientSpinner> createState() => _GradientSpinnerState();
+}
+
+class _GradientSpinnerState extends State<_GradientSpinner>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1200),
+    )..repeat();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _controller,
+      builder: (_, __) => Transform.rotate(
+        angle: _controller.value * 2 * pi,
+        child: CustomPaint(
+          painter: _GradientSpinnerPainter(),
+          size: const Size(52, 52),
+        ),
+      ),
+    );
+  }
+}
+
+class _GradientSpinnerPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final center = Offset(size.width / 2, size.height / 2);
+    final radius = size.width / 2 - 6;
+    final rect = Rect.fromCircle(center: center, radius: radius);
+
+    final gradient = SweepGradient(
+      startAngle: 0,
+      endAngle: 2 * pi,
+      colors: const [
+        Colors.white,
+        Color(0xFFDDDDDD),
+        Color(0xFFAAAAAA),
+        Color(0xFF777777),
+        Color(0xFF444444),
+        Color(0xFF111111),
+        Colors.transparent,
+        Colors.white,
+      ],
+      stops: const [0.0, 0.12, 0.30, 0.50, 0.68, 0.82, 0.92, 1.0],
+    );
+
+    final paint = Paint()
+      ..shader = gradient.createShader(rect)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 8
+      ..strokeCap = StrokeCap.butt;
+
+    canvas.drawCircle(center, radius, paint);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }

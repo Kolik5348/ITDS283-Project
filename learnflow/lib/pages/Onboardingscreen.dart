@@ -7,185 +7,149 @@ class OnboardingScreen extends StatefulWidget {
   State<OnboardingScreen> createState() => _OnboardingScreenState();
 }
 
-class _OnboardingScreenState extends State<OnboardingScreen>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-  late Animation<Offset> _slideAnimation;
-  late Animation<double> _fadeAnimation;
+class _OnboardingScreenState extends State<OnboardingScreen> {
+  final PageController _pageController = PageController();
+  int _currentPage = 0;
 
-  @override
-  void initState() {
-    super.initState();
+  // ข้อมูลแต่ละ slide
+  final List<Map<String, String>> _slides = [
+    {
+      'image': 'assets/images/Img Onboarding2.webp',
+      'title': 'Personalized\nLearning Path',
+      'subtitle':
+          'LearnFlow creates a personalized learning path for you, '
+          'adjusting difficulty and topics in real-time so you always '
+          'study at the right level.',
+    },
+    {
+      'image': 'assets/images/Img Onboarding3.webp',
+      'title': 'AI Learning\nAnalysis',
+      'subtitle':
+          'LearnFlow uses AI to analyze your learning behavior, '
+          'identifying weak points and adapting content to improve '
+          'your understanding efficiently.',
+    },
+    {
+      'image': 'assets/images/Img Onboarding.webp',
+      'title': 'Learn Smarter\nNot Harder',
+      'subtitle':
+          'LearnFlow analyzes your strengths and weaknesses, '
+          'then guides you to practice exactly what you need. '
+          'Study smarter and track your progress every day.',
+    },
+  ];
 
-    _controller = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 900),
-    );
+  void _nextPage() {
+    if (_currentPage < _slides.length - 1) {
+      _pageController.nextPage(
+        duration: const Duration(milliseconds: 400),
+        curve: Curves.easeInOut,
+      );
+    } else {
+      _goToLogin();
+    }
+  }
 
-    // ข้อความ slide ขึ้นจากด้านล่าง
-    _slideAnimation = Tween<Offset>(
-      begin: const Offset(0, 0.3),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: _controller,
-      curve: Curves.easeOut,
-    ));
-
-    // fade in
-    _fadeAnimation = CurvedAnimation(
-      parent: _controller,
-      curve: Curves.easeIn,
-    );
-
-    _controller.forward();
+  void _goToLogin() {
+    Navigator.pushReplacementNamed(context, '/');
   }
 
   @override
   void dispose() {
-    _controller.dispose();
+    _pageController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    final isLastPage = _currentPage == _slides.length - 1;
+
     return Scaffold(
       body: Stack(
         children: [
-          // รูปพื้นหลังเต็มหน้าจอ
-          Positioned.fill(
-            child: Image.asset(
-              'assets/images/Img_Onboarding.webp',
-              fit: BoxFit.cover,
-            ),
+          // PageView — รูปพื้นหลัง
+          PageView.builder(
+            controller: _pageController,
+            itemCount: _slides.length,
+            onPageChanged: (index) {
+              setState(() => _currentPage = index);
+            },
+            itemBuilder: (context, index) {
+              return _buildSlide(_slides[index]);
+            },
           ),
 
-          // Gradient overlay — จากโปร่งใสด้านบน → ดำด้านล่าง
-          Positioned.fill(
-            child: Container(
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  stops: [0.0, 0.4, 1.0],
-                  colors: [
-                    Colors.transparent,
-                    Color(0x66000000),
-                    Color(0xCC000000),
-                  ],
+          // ปุ่ม back (หน้า 2 และ 3)
+          if (_currentPage > 0)
+            SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.only(left: 16, top: 8),
+                child: IconButton(
+                  icon: const Icon(Icons.arrow_back, color: Colors.white),
+                  onPressed: () {
+                    _pageController.previousPage(
+                      duration: const Duration(milliseconds: 400),
+                      curve: Curves.easeInOut,
+                    );
+                  },
                 ),
               ),
             ),
-          ),
 
-          // Content — animation slide + fade
-          SafeArea(
-            child: FadeTransition(
-              opacity: _fadeAnimation,
-              child: SlideTransition(
-                position: _slideAnimation,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Spacer(),
+          // ปุ่มด้านล่าง
+          Positioned(
+            bottom: 0,
+            left: 0,
+            right: 0,
+            child: Container(
+              padding: const EdgeInsets.fromLTRB(24, 0, 24, 40),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // ปุ่ม NEXT หรือ GET START
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF1DBA78),
+                        padding: const EdgeInsets.symmetric(vertical: 18),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                        elevation: 4,
+                        shadowColor: const Color(0xFF1DBA78).withOpacity(0.4),
+                      ),
+                      onPressed: _nextPage,
+                      child: Text(
+                        isLastPage ? "GET START" : "NEXT",
+                        style: const TextStyle(
+                          fontSize: 16,
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 1.2,
+                        ),
+                      ),
+                    ),
+                  ),
 
-                      // Title
-                      const Text(
-                        "Learn Smarter",
+                  const SizedBox(height: 16),
+
+                  // ปุ่ม Skip (ซ่อนในหน้าสุดท้าย)
+                  if (!isLastPage)
+                    TextButton(
+                      onPressed: _goToLogin,
+                      child: const Text(
+                        "Skip",
                         style: TextStyle(
                           color: Colors.white,
-                          fontSize: 44,
-                          fontWeight: FontWeight.bold,
-                          height: 1.1,
-                        ),
-                      ),
-                      const Text(
-                        "Not Harder",
-                        style: TextStyle(
-                          color: Color(0xFF1DBA78),
-                          fontSize: 44,
-                          fontWeight: FontWeight.bold,
-                          height: 1.1,
-                        ),
-                      ),
-
-                      const SizedBox(height: 12),
-
-                      // Subtitle
-                      const Text(
-                        "LearnFlow analyzes your strengths and weaknesses, "
-                        "then guides you to practice exactly what you need.",
-                        style: TextStyle(
-                          color: Colors.white70,
                           fontSize: 15,
-                          height: 1.6,
+                          fontWeight: FontWeight.w500,
                         ),
                       ),
-
-                      const SizedBox(height: 28),
-
-                      // Feature highlights 3 จุด
-                      _buildFeature(
-                        icon: Icons.psychology_outlined,
-                        text: "AI analyzes your weak points",
-                      ),
-                      const SizedBox(height: 12),
-                      _buildFeature(
-                        icon: Icons.track_changes_outlined,
-                        text: "Track your progress every day",
-                      ),
-                      const SizedBox(height: 12),
-                      _buildFeature(
-                        icon: Icons.lightbulb_outline,
-                        text: "Get personalized recommendations",
-                      ),
-
-                      const SizedBox(height: 36),
-
-                      // GET STARTED button
-                      SizedBox(
-                        width: double.infinity,
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF1DBA78),
-                            padding: const EdgeInsets.symmetric(vertical: 18),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(30),
-                            ),
-                            elevation: 4,
-                            shadowColor: const Color(0xFF1DBA78).withOpacity(0.5),
-                          ),
-                          onPressed: () {
-                            Navigator.pushReplacementNamed(context, '/');
-                          },
-                          child: const Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                "Get Started",
-                                style: TextStyle(
-                                  fontSize: 17,
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                  letterSpacing: 0.5,
-                                ),
-                              ),
-                              SizedBox(width: 8),
-                              Icon(
-                                Icons.arrow_forward_rounded,
-                                color: Colors.white,
-                                size: 20,
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-
-                      const SizedBox(height: 32),
-                    ],
-                  ),
-                ),
+                    )
+                  else
+                    const SizedBox(height: 36),
+                ],
               ),
             ),
           ),
@@ -194,34 +158,67 @@ class _OnboardingScreenState extends State<OnboardingScreen>
     );
   }
 
-  // Widget feature highlight แต่ละจุด
-  Widget _buildFeature({required IconData icon, required String text}) {
-    return Row(
+  Widget _buildSlide(Map<String, String> slide) {
+    return Stack(
       children: [
-        Container(
-          width: 36,
-          height: 36,
-          decoration: BoxDecoration(
-            color: const Color(0xFF1DBA78).withOpacity(0.2),
-            borderRadius: BorderRadius.circular(10),
-            border: Border.all(
-              color: const Color(0xFF1DBA78).withOpacity(0.5),
-              width: 1,
-            ),
-          ),
-          child: Icon(
-            icon,
-            color: const Color(0xFF1DBA78),
-            size: 20,
+        // รูปพื้นหลังเต็มหน้าจอ
+        Positioned.fill(
+          child: Image.asset(
+            slide['image']!,
+            fit: BoxFit.cover,
           ),
         ),
-        const SizedBox(width: 12),
-        Text(
-          text,
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 14,
-            fontWeight: FontWeight.w500,
+
+        // Gradient overlay — โปร่งใสด้านบน → ดำด้านล่าง
+        Positioned.fill(
+          child: Container(
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                stops: [0.0, 0.35, 0.65, 1.0],
+                colors: [
+                  Colors.transparent,
+                  Colors.transparent,
+                  Color(0x88000000),
+                  Color(0xDD000000),
+                ],
+              ),
+            ),
+          ),
+        ),
+
+        // ข้อความด้านล่าง
+        Positioned(
+          bottom: 220,
+          left: 24,
+          right: 24,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Title
+              Text(
+                slide['title']!,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 36,
+                  fontWeight: FontWeight.bold,
+                  height: 1.15,
+                ),
+              ),
+
+              const SizedBox(height: 14),
+
+              // Subtitle
+              Text(
+                slide['subtitle']!,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 14,
+                  height: 1.6,
+                ),
+              ),
+            ],
           ),
         ),
       ],
