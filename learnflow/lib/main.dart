@@ -4,6 +4,8 @@ import 'pages/OnboardingScreen.dart';
 import 'pages/LoginPage.dart';
 import 'pages/RegisterPage.dart';
 import 'pages/ForgotPasswordPage.dart';
+import 'pages/home_screen.dart';
+import 'pages/quiz_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -24,6 +26,8 @@ class MyApp extends StatelessWidget {
         '/':                (context) => const LoginPage(),
         '/register':        (context) => const RegisterPage(),
         '/forgot-password': (context) => const ForgotPasswordPage(),
+        '/home':            (context) => const HomeScreen(),
+        '/quiz': (context) => QuizScreen(),
       },
     );
   }

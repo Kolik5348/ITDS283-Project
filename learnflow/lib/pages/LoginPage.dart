@@ -252,7 +252,9 @@ class _LoginPageState extends State<LoginPage> {
                           borderRadius: BorderRadius.circular(30),
                         ),
                       ),
-                      onPressed: () {},
+                      onPressed: () {
+                        Navigator.pushReplacementNamed(context, '/home');
+                      },
                       child: const Text(
                         "Log In",
                         style: TextStyle(
