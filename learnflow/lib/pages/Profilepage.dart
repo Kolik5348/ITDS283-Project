@@ -65,18 +65,20 @@ class _ProfilePageState extends State<ProfilePage> with WidgetsBindingObserver {
     }
   }
 
-  // โหลด notification state จาก SharedPreferences (เชื่อถือได้กว่า pending count)
+  // โหลด notification state จาก SharedPreferences เท่านั้น
+  // ถ้า prefs=false ให้ปิดเสมอ โดยไม่ต้องตรวจ OS permission
+  // (hasPermission ตรวจแค่ว่า OS อนุญาตไหม ไม่ใช่ว่าผู้ใช้เปิด Switch ไว้หรือเปล่า)
   Future<void> _loadNotificationState() async {
     try {
       final enabled = await NotificationService.loadEnabled();
-      // ถ้า prefs บอกว่าเปิดอยู่ ให้ตรวจ permission จริงด้วย
-      // เพื่อกรณีที่ผู้ใช้ไปปิด permission ใน Settings ด้วยตัวเอง
       if (enabled) {
+        // prefs=true → ตรวจว่า OS ยังอนุญาตอยู่ไหม
+        // กรณีผู้ใช้ไปปิด permission ใน Settings ด้วยตัวเอง
         final permitted = await NotificationService.hasPermission();
+        if (!permitted) await NotificationService.cancelAll(); // sync prefs
         if (mounted) setState(() => _notifications = permitted);
-        // ถ้า permission หายไป ให้อัปเดต prefs ด้วย
-        if (!permitted) await NotificationService.cancelAll();
       } else {
+        // prefs=false → ปิดเลย ไม่ตรวจ permission
         if (mounted) setState(() => _notifications = false);
       }
     } catch (_) {}
