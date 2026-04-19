@@ -17,7 +17,6 @@
     - [1. ตั้งค่า Database](#1-ตั้งค่า-database)
     - [2. ตั้งค่า Backend (Flask)](#2-ตั้งค่า-backend-flask)
     - [3. ตั้งค่า Flutter App](#3-ตั้งค่า-flutter-app)
-    - [Checklist ก่อนรัน](#checklist-ก่อนรัน)
   - [API Reference](#api-reference)
     - [Authentication](#authentication)
     - [Profile](#profile)
@@ -234,20 +233,6 @@ cd learnflow
 flutter pub get
 flutter run
 ```
-
----
-
-### Checklist ก่อนรัน
-
-- [ ] MySQL schema และ seed data ครบทั้งหมด
-- [ ] `serviceAccountKey.json` วางไว้ใน `config/` และเพิ่มใน `.gitignore`
-- [ ] `.env` ตั้งค่าครบถ้วน
-- [ ] `python app.py` รันที่ port 5000 สำเร็จ
-- [ ] `baseUrl` ใน `api_service.dart` ถูกต้องตาม device
-- [ ] `usesCleartextTraffic="true"` ใน `AndroidManifest.xml`
-- [ ] `flutter run` เลือก device สำเร็จ
-
----
 
 ## API Reference
 
