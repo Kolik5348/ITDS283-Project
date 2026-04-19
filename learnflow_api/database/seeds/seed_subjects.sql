@@ -4,7 +4,6 @@
 
 USE learnflow;
 
--- ล้างข้อมูลเก่าออกก่อน (ปิด FK check ชั่วคราวเพื่อ TRUNCATE ได้)
 SET FOREIGN_KEY_CHECKS = 0;
 TRUNCATE TABLE choices;
 TRUNCATE TABLE questions;

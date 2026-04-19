@@ -1,15 +1,3 @@
-"""Quiz Service — Business logic layer for quiz operations
-
-Separates database queries and business logic from route handlers.
-Makes code more testable and reusable.
-
-Functions:
-- get_quizzes_page(page, limit) — Get paginated list of quizzes
-- get_quiz_detail(quiz_id) — Get quiz with all questions and choices
-- check_quiz_attempted(user_id, quiz_id) — Check if user attempted quiz
-- submit_quiz_answers(user_id, quiz_id, time_spent, answers) — Process submission
-"""
-
 from db_config import get_connection
 from ai_service import calculate_understanding, calculate_topic_mastery, get_level, get_action
 from progress_service import update_topic_analysis, update_progress
@@ -19,19 +7,8 @@ logger = logging.getLogger(__name__)
 
 
 class QuizService:
-    """Service class for quiz-related operations"""
-
     @staticmethod
     def get_quizzes_page(page: int, limit: int) -> dict:
-        """Get paginated list of quizzes
-        
-        Args:
-            page: Page number (1-indexed)
-            limit: Items per page (max 50)
-            
-        Returns:
-            {'quizzes': [...], 'pagination': {...}}
-        """
         page = max(1, page)
         limit = min(50, max(1, limit))
         offset = (page - 1) * limit
@@ -75,19 +52,6 @@ class QuizService:
 
     @staticmethod
     def get_quiz_detail(quiz_id: int) -> dict:
-        """Get quiz detail with all questions and choices (optimized JOIN)
-        
-        Uses single JOIN query to eliminate N+1 problem.
-        
-        Args:
-            quiz_id: Quiz ID
-            
-        Returns:
-            Quiz object with questions list and time_limit_seconds
-            
-        Raises:
-            ValueError: If quiz not found
-        """
         conn = get_connection()
         try:
             with conn.cursor() as cur:
@@ -152,15 +116,6 @@ class QuizService:
 
     @staticmethod
     def check_quiz_attempted(user_id: int, quiz_id: int) -> bool:
-        """Check if user has attempted quiz before
-        
-        Args:
-            user_id: User ID
-            quiz_id: Quiz ID
-            
-        Returns:
-            True if attempted, False otherwise
-        """
         conn = get_connection()
         try:
             with conn.cursor() as cur:

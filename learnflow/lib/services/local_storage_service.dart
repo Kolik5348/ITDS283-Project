@@ -1,11 +1,5 @@
 /// lib/services/local_storage_service.dart
-/// Local persistent storage สำหรับ quiz submissions (ใช้ Hive)
-/// 
-/// Features:
-/// - cacheQuizSubmission: save locally before API submission
-/// - getPendingSubmissions: retrieve all cached submissions
-/// - clearSubmission: delete after successful upload
-/// - Prevent data loss on network failure
+
 
 import 'package:hive_flutter/hive_flutter.dart';
 
@@ -46,14 +40,11 @@ class CachedQuizSubmission {
 class LocalStorageService {
   static late Box _quizSubmissionBox;
 
-  /// เริ่มต้น local storage (Hive initialization)
   static Future<void> init() async {
     await Hive.initFlutter();
     _quizSubmissionBox = await Hive.openBox(_quizSubmissionBoxName);
   }
 
-  /// เก็บ quiz submission ลง local storage ก่อนส่ง API
-  /// Return: cache key สำหรับ retrieve ทีหลัง
   static Future<String> cacheQuizSubmission({
     required int quizId,
     required List<Map<String, dynamic>> answers,
@@ -71,7 +62,6 @@ class LocalStorageService {
     return cacheKey;
   }
 
-  /// ดึง submissions ที่ยังไม่ได้ upload
   static Future<List<CachedQuizSubmission>> getPendingSubmissions() async {
     final submissions = <CachedQuizSubmission>[];
     for (final value in _quizSubmissionBox.values) {
@@ -82,17 +72,14 @@ class LocalStorageService {
     return submissions;
   }
 
-  /// ล้าง cache submission ที่อัพโหลดเรียบร้อยแล้ว
   static Future<void> clearSubmission(String cacheKey) async {
     await _quizSubmissionBox.delete(cacheKey);
   }
 
-  /// ล้าง cache submissions ทั้งหมด
   static Future<void> clearAllSubmissions() async {
     await _quizSubmissionBox.clear();
   }
 
-  /// ดึง จำนวน cached submissions (สำหรับ debugging)
   static int getSubmissionCount() {
     return _quizSubmissionBox.length;
   }

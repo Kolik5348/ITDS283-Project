@@ -8,12 +8,6 @@ recommendation_bp = Blueprint('recommendation', __name__)
 @recommendation_bp.route('/api/recommendations', methods=['GET'])
 @require_auth
 def get_recommendations():
-    """
-    GET /api/recommendations
-    ดึงคำแนะนำการเรียนรายวิชา - หยิบ quizzes แบบสุ่มๆ มาแสดง (curated selection):
-    - ดึง quizzes ทั้งหมด แบบสุ่ม ~5 อัน เร็วที่สุด
-    Flutter ใช้แสดงใน HomePage (RECOMMENDED FOR YOU)
-    """
     conn = get_connection()
     try:
         with conn.cursor() as cur:

@@ -1,20 +1,13 @@
 /// lib/main.dart
-/// App entry point — LearnFlow Flutter application
-/// 
-/// Setup:
-/// - Firebase initialization
-/// - Local storage (Hive) for offline quiz caching
-/// - Notification service
-/// - Multi-language support (Thai/English)
-/// - Global locale state management
+
 
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';  // ADD: Riverpod
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'firebase_options.dart';
 import 'services/notification_service.dart';
 import 'services/local_storage_service.dart';
-import 'services/secure_local_storage_service.dart';  // ADD: Secure storage
+import 'services/secure_local_storage_service.dart';
 
 import 'pages/SplashScreen.dart';
 import 'pages/OnboardingScreen.dart';
@@ -30,8 +23,6 @@ import 'pages/ReviewAnswerPage.dart';
 import 'pages/Analyticspage.dart';
 import 'pages/Profilepage.dart';
 import 'pages/Reminderpage.dart';
-
-/// ตั้งค่า app เริ่มต้น: Firebase, LocalStorage, Notifications
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -56,7 +47,7 @@ void main() async {
   );
 }
 
-// ── Global locale state ────────────────────────────────────────────────────
+//Global locale state
 class LearnFlowApp extends StatefulWidget {
   const LearnFlowApp({super.key});
 
@@ -76,7 +67,6 @@ class LearnFlowApp extends StatefulWidget {
 class _LearnFlowAppState extends State<LearnFlowApp> {
   Locale _locale = const Locale('en');
 
-  /// เปลี่ยน locale ของทั้ง app (Thai/English)
   void _changeLocale(Locale locale) {
     setState(() => _locale = locale);
   }
@@ -101,8 +91,8 @@ class _LearnFlowAppState extends State<LearnFlowApp> {
         '/forgot-password': (context) => const ForgotPasswordPage(),
         '/home':            (context) => const HomePage(),
         '/quiz':            (context) => const QuizPage(),
-        '/quiz-detail':     (context) => const QuizDetailPage(),   // เปลี่ยนจาก /detail-basic-math
-        '/quiz-play':       (context) => const QuizPlayPage(),     // เปลี่ยนจาก /basic-math
+        '/quiz-detail':     (context) => const QuizDetailPage(),
+        '/quiz-play':       (context) => const QuizPlayPage(),
         '/result':          (context) => const ResultPage(),
         '/review-answer': (context) {
           final args = ModalRoute.of(context)?.settings.arguments;

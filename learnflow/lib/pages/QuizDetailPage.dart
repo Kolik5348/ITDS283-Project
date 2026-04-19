@@ -1,6 +1,4 @@
 // lib/pages/QuizDetailPage.dart
-// FIX 1: แสดงจำนวนคำถามจริงจาก API (question_count) แทน total_questions ใน DB
-// FIX 2: ดึง quiz detail จาก API เพื่อให้ได้ question_count ที่นับจริง
 
 import 'package:flutter/material.dart';
 import '../services/quiz_service.dart';
@@ -24,10 +22,8 @@ class _QuizDetailPageState extends State<QuizDetailPage> {
   int  _quizId        = 1;
   Map<String, dynamic> _quiz = {};
 
-  // FIX: จำนวนคำถามจริงที่นับจาก questions table
   int? _actualQuestionCount;
 
-  // FIX: เวลาจริงจาก API (ตรงกับ QuizPlayPage)
   int? _timeLimitSeconds;
 
   @override
@@ -52,14 +48,12 @@ class _QuizDetailPageState extends State<QuizDetailPage> {
     }
   }
 
-  // FIX: ดึง question_count จริง และ time_limit_seconds จาก /api/quiz/<id>
   Future<void> _loadActualQuestionCount() async {
     setState(() => _isLoadingDetail = true);
     try {
       final detail = await QuizService.getQuizDetail(_quizId);
       final questions = detail['questions'] as List? ?? [];
       final timeLimitSec = detail['time_limit_seconds'] as int?;
-      // fallback คำนวณเหมือน API: EASY=1 นาที/ข้อ, MEDIUM/HARD=1.5 นาที/ข้อ
       final level = (_quiz['level'] ?? 'easy').toString().toUpperCase();
       final minsPerQ = (level == 'EASY') ? 1.0 : 1.5;
       final fallbackSec = ((questions.isNotEmpty ? questions.length : 10) * minsPerQ * 60).toInt();
@@ -69,7 +63,6 @@ class _QuizDetailPageState extends State<QuizDetailPage> {
         _isLoadingDetail = false;
       });
     } catch (_) {
-      // fallback ใช้ค่าจาก quiz list ถ้า API ล้มเหลว
       setState(() {
         _actualQuestionCount = _quiz['question_count'] ?? _quiz['total_questions'];
         _timeLimitSeconds = null;
@@ -78,7 +71,6 @@ class _QuizDetailPageState extends State<QuizDetailPage> {
     }
   }
 
-  // FIX: แปลงวินาทีเป็น "X MINS" หรือ "X HR Y MINS"
   String _formatTimeLimit(int seconds) {
     final totalMins = (seconds / 60).ceil();
     if (totalMins >= 60) {
@@ -95,7 +87,6 @@ class _QuizDetailPageState extends State<QuizDetailPage> {
     final subject = (_quiz['subject_name']   ?? 'SUBJECT').toString().toUpperCase();
     final level   = (_quiz['level']          ?? 'EASY').toString().toUpperCase();
 
-    // FIX: ใช้ _actualQuestionCount ที่นับจริง ถ้ายังโหลดอยู่ใช้ค่า fallback
     final displayQ = _actualQuestionCount
         ?? _quiz['question_count']
         ?? _quiz['total_questions']
@@ -177,12 +168,10 @@ class _QuizDetailPageState extends State<QuizDetailPage> {
       const SizedBox(height: 12),
       _detailRow('SUBJECT :', subject),
       const SizedBox(height: 8),
-      // FIX: แสดง loading ถ้ากำลังนับคำถาม
       _isLoadingDetail
           ? _detailRowLoading('QUESTIONS :')
           : _detailRow('QUESTIONS :', '$displayQ'),
       const SizedBox(height: 8),
-      // FIX: แสดงเวลาจาก API ให้ตรงกับ QuizPlayPage (ไม่ hardcode 45 MINS)
       _isLoadingDetail
           ? _detailRowLoading('TIME LIMIT :')
           : _detailRow('TIME LIMIT :',
@@ -217,7 +206,6 @@ class _QuizDetailPageState extends State<QuizDetailPage> {
     );
   }
 
-  // FIX: skeleton สำหรับ loading state
   Widget _detailRowLoading(String label) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),

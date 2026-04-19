@@ -1,13 +1,12 @@
 USE learnflow;
--- 03_quiz_system.sql  [FIXED]
--- แก้ไข: sudject_id → subject_id, total_question → total_questions
+-- 03_quiz_system.sql
 
 CREATE TABLE IF NOT EXISTS quizzes (
     quiz_id         INT             NOT NULL AUTO_INCREMENT,
-    subject_id      INT             NOT NULL,                  -- FIX: sudject_id → subject_id
+    subject_id      INT             NOT NULL,                  
     title           VARCHAR(255)    NOT NULL,
     level           ENUM('easy', 'medium', 'hard') NOT NULL,
-    total_questions INT             NOT NULL DEFAULT 0,        -- FIX: total_question → total_questions
+    total_questions INT             NOT NULL DEFAULT 0,        
 
     PRIMARY KEY (quiz_id),
     FOREIGN KEY (subject_id) REFERENCES subjects(subject_id)

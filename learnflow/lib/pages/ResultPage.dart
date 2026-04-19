@@ -1,12 +1,4 @@
 /// lib/pages/ResultPage.dart
-/// หน้าแสดงผลลัพธ์หลังจากทำ Quiz เสร็จ
-/// 
-/// Features:
-/// - Display score, grade, badge
-/// - Performance breakdown (accuracy, speed, understanding)
-/// - Detailed question review link
-/// - Retry quiz button
-/// - Navigate back to HomePage
 
 import 'package:flutter/material.dart';
 import '../services/result_service.dart';
@@ -85,7 +77,6 @@ class _ResultPageState extends State<ResultPage> {
                 child: const Icon(Icons.person, color: primaryGreen, size: 30)),
           ]),
           const SizedBox(height: 16),
-          // รูปภาพประจำวิชา — แสดงตามวิชาของข้อสอบที่เลือก
           Center(child: _buildSubjectImage(subject)),
           const SizedBox(height: 24),
           const Text('QUIZ DETAILS', style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold, color: primaryGreen)),
@@ -148,7 +139,6 @@ class _ResultPageState extends State<ResultPage> {
     );
   }
 
-  /// รูปภาพประจำวิชา — แสดงตามวิชาของข้อสอบ
   Widget _buildSubjectImage(String subject) {
     String? assetPath;
     final s = subject.toUpperCase();

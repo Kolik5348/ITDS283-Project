@@ -1,5 +1,5 @@
 USE learnflow;
--- 05_ai_analysis.sql  [FIXED + ON DELETE CASCADE]
+-- 05_ai_analysis.sql
 
 CREATE TABLE IF NOT EXISTS topic_analysis (
     analysis_id     INT             NOT NULL AUTO_INCREMENT,
@@ -25,7 +25,7 @@ CREATE TABLE IF NOT EXISTS recommendations (
     user_id     INT             NOT NULL,
     subject_id  INT             NOT NULL,
     topic       VARCHAR(100)    NOT NULL,
-    action      ENUM('practice', 'review', 'pass') NOT NULL,  -- FIX: เปลี่ยนจากภาษาไทยเป็น English
+    action      ENUM('practice', 'review', 'pass') NOT NULL,
     mastery     FLOAT           NOT NULL DEFAULT 0,
     created_at  DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP,
 

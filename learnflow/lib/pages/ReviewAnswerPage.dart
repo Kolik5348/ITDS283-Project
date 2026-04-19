@@ -39,7 +39,6 @@ class _ReviewAnswerPageState extends State<ReviewAnswerPage> {
   List<Map<String, dynamic>> _parseChoices(dynamic raw) {
     if (raw == null) return [];
     if (raw is List) return List<Map<String, dynamic>>.from(raw);
-    // MySQL JSON_ARRAYAGG returns string when fetched via pymysql
     try {
       final decoded = jsonDecode(raw.toString());
       return List<Map<String, dynamic>>.from(decoded);

@@ -1,11 +1,4 @@
 /// lib/services/secure_local_storage_service.dart
-/// Encrypted local storage service using Hive with encryption
-///
-/// Features:
-/// - Encrypted storage for sensitive data
-/// - AES encryption with randomly generated key
-/// - Only caches non-sensitive metadata (not answers)
-/// - Automatic cleanup of old cache entries
 
 import 'package:hive_flutter/hive_flutter.dart';
 import 'dart:typed_data';
@@ -13,10 +6,8 @@ import 'package:encrypt/encrypt.dart' as encrypt;
 import 'dart:async';
 import 'dart:convert';
 
-// Encryption key generation (256-bit key for AES)
 const int _encryptionKeyLength = 32; // 256-bit
 
-// Box names
 const String _encryptedCacheBoxName = 'secure_cache';
 const String _submissionMetadataBoxName = 'submission_metadata';
 
@@ -28,19 +19,15 @@ class SecureLocalStorageService {
   static late encrypt.IV _encryptionIV;
   static late encrypt.Encrypter _encrypter;
 
-  /// Initialize secure local storage with encryption
   static Future<void> init() async {
     await Hive.initFlutter();
     
-    // Generate or retrieve encryption key
     _encryptionKey = await _getOrGenerateEncryptionKey();
     
-    // Initialize AES encrypter
     _aesKey = encrypt.Key(_encryptionKey);
-    _encryptionIV = encrypt.IV.fromLength(16); // 16 bytes IV for AES
+    _encryptionIV = encrypt.IV.fromLength(16);
     _encrypter = encrypt.Encrypter(encrypt.AES(_aesKey));
-    
-    // Open boxes (unencrypted at Hive level, manual encryption applied)
+
     try {
       _encryptedCacheBox = await Hive.openBox(
         _encryptedCacheBoxName,
@@ -52,25 +39,11 @@ class SecureLocalStorageService {
     }
   }
 
-  /// Generate or retrieve encryption key from secure storage
   static Future<Uint8List> _getOrGenerateEncryptionKey() async {
-    // ⚠️ NOTE: In production, store this key in platform-specific secure storage:
-    // Android: Use EncryptedSharedPreferences
-    // iOS: Use Keychain
-    // For now, generate a random key per app session
-    
-    // In a real app, you would use flutter_secure_storage:
-    // final secureStorage = FlutterSecureStorage();
-    // final keyString = await secureStorage.read(key: 'hive_encryption_key');
-    // if (keyString != null) return base64Decode(keyString);
-    
-    // For demo, generate random key
     final key = encrypt.Key.fromSecureRandom(_encryptionKeyLength);
     return key.bytes;
   }
 
-  /// Cache quiz submission metadata (NOT answers - those are sensitive)
-  /// Only cache: quiz_id, time_spent, timestamp
   static Future<void> cacheQuizSubmissionMetadata({
     required int quizId,
     required int timeSpent,
@@ -81,7 +54,7 @@ class SecureLocalStorageService {
         'quiz_id': quizId,
         'time_spent': timeSpent,
         'timestamp': timestamp.toIso8601String(),
-        'synced': false, // Mark as unsynced
+        'synced': false,
       };
       
       final key = '${quizId}_${timestamp.millisecondsSinceEpoch}';
@@ -91,7 +64,6 @@ class SecureLocalStorageService {
     }
   }
 
-  /// Get all unsynced submission metadata
   static Future<List<Map<String, dynamic>>> getPendingSubmissions() async {
     try {
       final pending = <Map<String, dynamic>>[];
@@ -107,7 +79,6 @@ class SecureLocalStorageService {
     }
   }
 
-  /// Mark submission as synced (synced = true)
   static Future<void> markSubmissionSynced(int quizId, String timestamp) async {
     try {
       final key = '${quizId}_$timestamp';
@@ -121,7 +92,6 @@ class SecureLocalStorageService {
     }
   }
 
-  /// Clear all synced submissions (cleanup cache)
   static Future<void> clearSyncedSubmissions() async {
     try {
       final keysToDelete = <dynamic>[];
@@ -139,8 +109,6 @@ class SecureLocalStorageService {
     }
   }
 
-  /// Store encrypted data (for future use with sensitive data)
-  /// Encrypts the value using AES before storing
   static Future<void> setEncrypted(String key, dynamic value) async {
     try {
       final plaintext = jsonEncode(value);
@@ -151,8 +119,6 @@ class SecureLocalStorageService {
     }
   }
 
-  /// Retrieve encrypted data
-  /// Decrypts the value after retrieval
   static Future<dynamic> getEncrypted(String key) async {
     try {
       final encryptedBase64 = _encryptedCacheBox.get(key);
@@ -168,7 +134,6 @@ class SecureLocalStorageService {
     }
   }
 
-  /// Cleanup old cache entries (older than 7 days)
   static Future<void> cleanupOldCache() async {
     try {
       final now = DateTime.now();

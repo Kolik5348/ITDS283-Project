@@ -1,13 +1,4 @@
 /// lib/pages/Profilepage.dart
-/// หน้าแสดงผล Profile ของ User
-/// 
-/// Features:
-/// - Display user profile info + quiz stats
-/// - Edit profile dialog with validation
-/// - Settings: notifications, language, learning mode
-/// - Refresh on app resume (WidgetsBindingObserver)
-/// - Logout functionality
-
 import 'package:flutter/material.dart';
 import 'dart:developer' as dev;
 import 'package:firebase_auth/firebase_auth.dart';
@@ -29,7 +20,6 @@ class _ProfilePageState extends State<ProfilePage> with WidgetsBindingObserver {
   static const Color cardGreen    = Color(0xFF81E3AB);
   static const Color bgColor      = Color(0xFFF0FBF4);
 
-  // FIX: เริ่มต้นเป็น false แล้วค่อย load state จริงจาก pending notifications
   bool   _notifications    = false;
   String _preferredSubject = 'Mathematics';
   String _learningMode     = 'Normal';
@@ -42,7 +32,7 @@ class _ProfilePageState extends State<ProfilePage> with WidgetsBindingObserver {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     _loadProfile();
-    _loadNotificationState(); // FIX: โหลด notification state จริงตอน init
+    _loadNotificationState();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
@@ -61,24 +51,18 @@ class _ProfilePageState extends State<ProfilePage> with WidgetsBindingObserver {
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed && mounted) {
       _loadProfile();
-      _loadNotificationState(); // FIX: refresh notification state เมื่อกลับมาที่แอป
+      _loadNotificationState();
     }
   }
 
-  // โหลด notification state จาก SharedPreferences เท่านั้น
-  // ถ้า prefs=false ให้ปิดเสมอ โดยไม่ต้องตรวจ OS permission
-  // (hasPermission ตรวจแค่ว่า OS อนุญาตไหม ไม่ใช่ว่าผู้ใช้เปิด Switch ไว้หรือเปล่า)
   Future<void> _loadNotificationState() async {
     try {
       final enabled = await NotificationService.loadEnabled();
       if (enabled) {
-        // prefs=true → ตรวจว่า OS ยังอนุญาตอยู่ไหม
-        // กรณีผู้ใช้ไปปิด permission ใน Settings ด้วยตัวเอง
         final permitted = await NotificationService.hasPermission();
-        if (!permitted) await NotificationService.cancelAll(); // sync prefs
+        if (!permitted) await NotificationService.cancelAll();
         if (mounted) setState(() => _notifications = permitted);
       } else {
-        // prefs=false → ปิดเลย ไม่ตรวจ permission
         if (mounted) setState(() => _notifications = false);
       }
     } catch (_) {}
@@ -248,11 +232,9 @@ class _ProfilePageState extends State<ProfilePage> with WidgetsBindingObserver {
   Future<void> _toggleNotifications(bool value) async {
     setState(() => _notifications = value);
     if (value) {
-      // 1. ขอ permission ก่อน แล้วรอผลว่าได้รับหรือไม่
       final granted = await NotificationService.requestPermission();
 
       if (!granted) {
-        // ไม่ได้ permission → Switch กลับเป็น false + แจ้งผู้ใช้
         if (mounted) setState(() => _notifications = false);
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
@@ -263,7 +245,6 @@ class _ProfilePageState extends State<ProfilePage> with WidgetsBindingObserver {
         return;
       }
 
-      // 2. มี permission แล้ว → schedule และบันทึก state ลง prefs
       final success = await NotificationService.scheduleDailyReminder();
       if (mounted) setState(() => _notifications = success);
 
@@ -276,7 +257,6 @@ class _ProfilePageState extends State<ProfilePage> with WidgetsBindingObserver {
         ));
       }
     } else {
-      // ปิด: ยกเลิก notification + บันทึก state ลง prefs
       await NotificationService.cancelAll();
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -324,7 +304,6 @@ class _ProfilePageState extends State<ProfilePage> with WidgetsBindingObserver {
     );
   }
 
-  // FIX: logout ต้อง signOut Google Sign-In ด้วย
   Future<void> _logout() async {
     try { await NotificationService.cancelAll(); } catch (_) {}
     try { await GoogleSignIn().signOut(); } catch (_) {}

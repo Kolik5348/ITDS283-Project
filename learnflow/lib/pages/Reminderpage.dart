@@ -14,8 +14,6 @@ class _ReminderPageState extends State<ReminderPage> {
   static const Color primaryGreen = Color(0xFF1DBA78);
   static const Color cardGreen    = Color(0xFF81E3AB);
 
-  // ใช้ SharedPreferences state แทน pendingNotificationRequests()
-  // เพราะ inexact alarm จะไม่ปรากฏใน pendingNotificationRequests() บน Android
   bool _enabled   = false;
   bool _isLoading = true;
 
@@ -29,7 +27,6 @@ class _ReminderPageState extends State<ReminderPage> {
     setState(() => _isLoading = true);
     try {
       final enabled = await NotificationService.loadEnabled();
-      // ตรวจ permission จริงด้วย กรณีผู้ใช้ไปปิดใน Settings
       if (enabled) {
         final permitted = await NotificationService.hasPermission();
         if (!permitted) await NotificationService.cancelAll();
@@ -43,7 +40,7 @@ class _ReminderPageState extends State<ReminderPage> {
   }
 
   Future<void> _cancelAll() async {
-    await NotificationService.cancelAll(); // บันทึก false ลง prefs ด้วย
+    await NotificationService.cancelAll();
     if (mounted) {
       setState(() => _enabled = false);
       ScaffoldMessenger.of(context).showSnackBar(

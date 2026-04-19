@@ -32,7 +32,6 @@ class _HomePageState extends State<HomePage> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    // ดึงข้อมูลใหม่ทุกครั้งที่หน้า pop กลับ (เช่นจากหน้า Result)
     _loadData();
   }
 
@@ -180,8 +179,7 @@ class _HomePageState extends State<HomePage> {
       ],
     );
   }
-
-  // แสดงตลอดเวลา ไม่ขึ้นกับ notification state
+  
   Widget _buildReminderCard() {
     return GestureDetector(
       onTap: () => Navigator.pushNamed(context, '/reminder'),

@@ -29,7 +29,7 @@ class _LoginPageState extends State<LoginPage> {
     super.dispose();
   }
 
-  // ── Email / Password Login ────────────────────────────────────────────────
+  //Email / Password Login
   Future<void> _login() async {
     if (_emailController.text.trim().isEmpty ||
         _passwordController.text.trim().isEmpty) {
@@ -42,7 +42,6 @@ class _LoginPageState extends State<LoginPage> {
         email:    _emailController.text.trim(),
         password: _passwordController.text.trim(),
       );
-      // Email login ไม่ต้อง sync API (สร้างตอน register แล้ว)
       if (mounted) Navigator.pushReplacementNamed(context, '/home');
     } on FirebaseAuthException catch (e) {
       _showSnack(_firebaseMessage(e.code, e.message));
@@ -53,7 +52,7 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
-  // ── Google Sign-In ────────────────────────────────────────────────────────
+  //Google Sign-In
   Future<void> _loginWithGoogle() async {
     setState(() => _isLoading = true);
     try {
@@ -62,7 +61,6 @@ class _LoginPageState extends State<LoginPage> {
         final provider = GoogleAuthProvider()..addScope('email');
         cred = await FirebaseAuth.instance.signInWithPopup(provider);
       } else {
-        // signOut ก่อนเพื่อให้ Google account picker แสดงเสมอ
         final googleSignIn = GoogleSignIn();
         await googleSignIn.signOut();
 
@@ -80,12 +78,9 @@ class _LoginPageState extends State<LoginPage> {
         );
       }
 
-      // FIX: Sync user → MySQL ก่อน navigate เสมอ
-      // ถ้า sync ล้มเหลว → user ไม่มีใน DB → /api/profile และ /api/recommendations จะได้ 404
       final displayName = cred.user?.displayName ?? '';
       await AuthService.syncGoogleLogin(displayName);
 
-      // Sync สำเร็จแล้วค่อย navigate
       if (mounted) Navigator.pushReplacementNamed(context, '/home');
 
     } on FirebaseAuthException catch (e) {
@@ -95,11 +90,8 @@ class _LoginPageState extends State<LoginPage> {
         _showSnack('Google sign-in failed: ${e.message}');
       }
     } on ApiException catch (e) {
-      // FIX: ไม่ navigate ถ้า API sync ล้มเหลว
-      // เดิม: navigate ต่อทั้งที่ user ยังไม่มีใน MySQL → HomePage ได้ 404
       debugPrint('API sync failed: ${e.message}');
       _showSnack('ไม่สามารถเชื่อมต่อ Server ได้ กรุณาลองใหม่');
-      // Sign out จาก Firebase ด้วย เพื่อให้ user กด login ใหม่และ sync ใหม่อีกครั้ง
       await FirebaseAuth.instance.signOut();
     } catch (e) {
       _showSnack('Google sign-in failed. Please try again.');
@@ -130,7 +122,6 @@ class _LoginPageState extends State<LoginPage> {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            // ── Header ──────────────────────────────────────────────────────
             Container(
               width: double.infinity,
               padding: const EdgeInsets.only(top: 60, left: 24, right: 24, bottom: 30),
@@ -151,7 +142,7 @@ class _LoginPageState extends State<LoginPage> {
               ),
             ),
 
-            // ── Form ─────────────────────────────────────────────────────────
+            //Form
             Container(
               color: Colors.white,
               padding: const EdgeInsets.all(20),

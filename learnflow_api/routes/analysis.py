@@ -1,17 +1,3 @@
-"""Analytics endpoints — dashboard and growth charts data.
-
-Endpoints:
-- GET /api/dashboard?days=7 — Get topic mastery, accuracy, speed, all-time stats
-- GET /api/growth — Get all-time progress for growth chart
-- GET /api/analysis — Get topic mastery all-time
-
-Features:
-- Input validation (days parameter 1-365)
-- Efficient database queries with JOINs
-- Radar chart calculations (3-decimal rounding)
-- Bar chart data for topic mastery
-"""
-
 from flask import Blueprint, jsonify, g, request
 from db_config import get_connection
 from auth_middleware import require_auth
@@ -22,10 +8,7 @@ analysis_bp = Blueprint('analysis', __name__)
 @analysis_bp.route('/api/analysis', methods=['GET'])
 @require_auth
 def get_analysis():
-    """GET /api/analysis — ดึง topic mastery รายวิชา (all-time)
-    
-    Return: list of topics with accuracy, speed, understanding, mastery scores
-    """
+
     conn = get_connection()
     try:
         with conn.cursor() as cur:
@@ -56,15 +39,8 @@ def get_analysis():
 @analysis_bp.route('/api/dashboard', methods=['GET'])
 @require_auth
 def get_dashboard():
-    """
-    GET /api/dashboard?days=7
-    Line chart ใช้ days จาก query param
-    Bar / Radar / Recommendations ไม่เปลี่ยน (all-time)
-    FIX: Add comprehensive input validation
-    """
     try:
         days = int(request.args.get('days', 7))
-        # FIX: Validate days range properly
         if days < 1 or days > 365:
             return jsonify({'error': 'Days must be between 1 and 365'}), 400
         days = max(1, min(365, days))
@@ -143,15 +119,9 @@ def get_dashboard():
         conn.close()
 
 
-# FIX: endpoint ใหม่สำหรับ Growth chart — ดึง progress ทุก session all-time
 @analysis_bp.route('/api/growth', methods=['GET'])
 @require_auth
 def get_growth():
-    """
-    GET /api/growth
-    ดึง progress ทั้งหมดที่เคยทำ ไม่จำกัดวัน
-    ใช้สำหรับ Growth chart ใน Analytics page
-    """
     conn = get_connection()
     try:
         with conn.cursor() as cur:

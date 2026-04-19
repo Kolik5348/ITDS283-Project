@@ -1,18 +1,4 @@
 /// lib/pages/QuizPlayPage.dart
-/// หน้า Quiz ระหว่างการทำข้อสอบ
-/// 
-/// Features:
-/// - Display quiz questions + choices (A/B/C/D)
-/// - Timer countdown with auto-submit on time-up
-/// - Track per-question response time
-/// - Local cache quiz submission before API (prevent data loss)
-/// - Retry on submission failure
-/// - Navigate to ResultPage on success
-///
-/// Timer Management:
-/// - Fetches time_limit_seconds from API
-/// - Nullable Timer to prevent memory leak
-/// - Safe dispose in _finish() and dispose()
 
 import 'dart:async';
 import 'package:flutter/material.dart';
@@ -32,25 +18,24 @@ class _QuizPlayPageState extends State<QuizPlayPage> {
   static const Color cardGreen    = Color.fromARGB(255, 129, 227, 171);
   static const Color bgColor      = Color(0xFFF0FBF4);
 
-  // ── API data ───────────────────────────────────────────────────────────────
+  //API data
   Map<String, dynamic>? _quizData;
   List<Map<String, dynamic>> _questions = [];
   bool _isLoading = true;
   String? _error;
 
-  int _quizId      = 1; // default; overridden by route arguments
-  int _timeLimitSec = 45 * 60;  // Default fallback; will be overridden by API
+  int _quizId      = 1; 
+  int _timeLimitSec = 45 * 60;
 
-  // ── Quiz state ─────────────────────────────────────────────────────────────
+  //Quiz state
   int _currentQuestion = 0;
   int _remainingSeconds = 0;
   Timer? _timer;  // FIX: Allow null to track if timer exists
   late List<int?> _selectedAnswers;
-  // track response time per question (seconds)
   late List<double> _responseTimes;
   DateTime? _questionStartTime;
 
-  // ── Labels A/B/C/D → index 0/1/2/3 ───────────────────────────────────────
+  //Labels A/B/C/D → index 0/1/2/3
   static const _labelToIndex = {'A': 0, 'B': 1, 'C': 2, 'D': 3};
   static const _indexToLabel = ['A', 'B', 'C', 'D'];
 
@@ -70,8 +55,6 @@ class _QuizPlayPageState extends State<QuizPlayPage> {
       final data = await QuizService.getQuizDetail(_quizId);
       final questions = List<Map<String, dynamic>>.from(data['questions'] ?? []);
       
-      // FIX: Get time_limit from API instead of hardcoding
-      // fallback: EASY=1 นาที/ข้อ, MEDIUM/HARD=1.5 นาที/ข้อ (เหมือน API)
       final timeLimitFromApi = data['time_limit_seconds'] as int?;
       final level = ((data['level'] ?? 'easy') as String).toUpperCase();
       final minsPerQ = (level == 'EASY') ? 1.0 : 1.5;
@@ -83,7 +66,7 @@ class _QuizPlayPageState extends State<QuizPlayPage> {
         _questions         = questions;
         _selectedAnswers   = List.filled(questions.length, null);
         _responseTimes     = List.filled(questions.length, 0);
-        _timeLimitSec      = timeLimitToUse;  // Use API value
+        _timeLimitSec      = timeLimitToUse;
         _remainingSeconds  = timeLimitToUse;
         _isLoading         = false;
         _questionStartTime = DateTime.now();
@@ -129,7 +112,6 @@ class _QuizPlayPageState extends State<QuizPlayPage> {
 
   Future<void> _finish() async {
     _recordResponseTime();
-    // FIX: Safely cancel timer
     if (_timer != null && _timer!.isActive) {
       _timer!.cancel();
     }
@@ -150,14 +132,12 @@ class _QuizPlayPageState extends State<QuizPlayPage> {
     }
     final timeSpent = _timeLimitSec - _remainingSeconds;
 
-    // Cache locally before sending
     await LocalStorageService.cacheQuizSubmission(
       quizId: _quizId,
       answers: answers,
       timeSpent: timeSpent,
     );
 
-    // Show loading dialog while submitting
     if (mounted) {
       showDialog(
         context: context,
@@ -175,17 +155,16 @@ class _QuizPlayPageState extends State<QuizPlayPage> {
         answers:   answers,
       );
 
-      // Invalidate analytics cache so Home/Analytics show updated data
       AnalyticsService.invalidateCache();
 
       if (mounted) {
-        Navigator.of(context).pop(); // close loading dialog
+        Navigator.of(context).pop();
         Navigator.pushReplacementNamed(context, '/result',
             arguments: {'attempt_id': result['attempt_id']});
       }
     } catch (e) {
       if (mounted) {
-        Navigator.of(context).pop(); // close loading dialog
+        Navigator.of(context).pop();
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: const Text('ส่งคำตอบไม่สำเร็จ กรุณาลองใหม่'),
@@ -235,7 +214,6 @@ class _QuizPlayPageState extends State<QuizPlayPage> {
 
   @override
   void dispose() {
-    // FIX: Safely cancel timer if it exists and is active
     if (_timer != null && _timer!.isActive) {
       _timer!.cancel();
     }
@@ -319,7 +297,6 @@ class _QuizPlayPageState extends State<QuizPlayPage> {
                         style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Colors.black87, height: 1.4)),
                   ),
                   const SizedBox(height: 20),
-                  // Choices from API (A/B/C/D)
                   ...choices.map((choice) {
                     final label = choice['choice_label'] ?? '';
                     final idx   = _labelToIndex[label] ?? 0;

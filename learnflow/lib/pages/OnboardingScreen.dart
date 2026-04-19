@@ -169,7 +169,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           ),
         ),
 
-        // Gradient overlay
         Positioned.fill(
           child: Container(
             decoration: const BoxDecoration(
@@ -188,7 +187,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           ),
         ),
 
-        // ข้อความ
         Positioned(
           bottom: 220,
           left: 24,

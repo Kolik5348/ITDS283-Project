@@ -1173,10 +1173,6 @@ QUESTIONS = [
 
 
 def ensure_unique_constraint(cur):
-    """
-    FIX: เพิ่ม UNIQUE KEY บน (quiz_id, question_text) ถ้ายังไม่มี
-    ป้องกันข้อสอบซ้ำในระดับ DB — รัน seed กี่รอบก็ไม่ซ้ำ
-    """
     try:
         cur.execute("""
             SELECT COUNT(*) as cnt
@@ -1199,10 +1195,6 @@ def ensure_unique_constraint(cur):
 
 
 def remove_existing_duplicates(cur):
-    """
-    FIX: ลบข้อซ้ำที่อาจมีอยู่แล้วใน DB ก่อนเพิ่ม UNIQUE KEY
-    เก็บ question_id ต่ำสุด (ข้อแรกที่ insert) ลบที่เหลือ
-    """
     cur.execute("""
         DELETE q1
         FROM questions q1
@@ -1219,9 +1211,6 @@ def remove_existing_duplicates(cur):
 
 
 def seed():
-    """รัน seed คำถามและตัวเลือกทั้งหมดลง MySQL
-    FIX: ป้องกันซ้ำด้วย INSERT IGNORE + UNIQUE KEY
-    """
     conn = pymysql.connect(
         host=os.getenv('DB_HOST', 'localhost'),
         port=int(os.getenv('DB_PORT', 3306)),

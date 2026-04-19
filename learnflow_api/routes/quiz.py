@@ -1,19 +1,3 @@
-"""Quiz endpoints — retrieve quizzes and submit answers.
-
-Endpoints:
-- GET /api/quizzes?page=1&limit=20 — List quizzes with pagination
-- GET /api/quiz/<quiz_id> — Get quiz details + questions + choices
-- POST /api/quiz/<quiz_id>/submit — Submit quiz answers
-
-Features:
-- Pagination support (default 20 per page, max 50)
-- Time limit calculation (max(15, questions * 2.5) minutes)
-- Attempt tracking (logs retakes)
-- Score/accuracy/speed/understanding calculation
-- Transaction safety for quiz submission
-- Integration with progress_service and ai_service
-"""
-
 from flask import Blueprint, request, jsonify, g
 import logging
 import sys
@@ -32,10 +16,6 @@ quiz_bp = Blueprint('quiz', __name__)
 
 
 def _validate_submit(quiz_id, time_spent, answers):
-    """ตรวจสอบ input สำหรับ quiz submission
-    
-    Return: None (valid) หรือ error message
-    """
     if not isinstance(quiz_id, int) or quiz_id <= 0:
         return 'Invalid quiz_id'
     if not isinstance(time_spent, (int, float)) or time_spent < 0:
@@ -59,11 +39,6 @@ def _validate_submit(quiz_id, time_spent, answers):
 @quiz_bp.route('/api/quizzes', methods=['GET'])
 @require_auth
 def get_quizzes():
-    """GET /api/quizzes?page=1&limit=20 — ดึงรายการ Quiz พร้อม pagination
-    
-    Params: page (default 1), limit (default 20, max 50)
-    Return: list of quizzes + pagination info
-    """
     try:
         page  = max(1, int(request.args.get('page', 1)))
         limit = min(50, max(1, int(request.args.get('limit', 20))))
@@ -81,10 +56,6 @@ def get_quizzes():
 @quiz_bp.route('/api/quiz/<int:quiz_id>', methods=['GET'])
 @require_auth
 def get_quiz_detail(quiz_id):
-    """GET /api/quiz/<quiz_id> — ดึงรายละเอียด Quiz + คำถาม + choices + time_limit
-    
-    Return: quiz detail + time_limit_seconds (calculated from questions count)
-    """
     try:
         quiz = QuizService.get_quiz_detail(quiz_id)
         return jsonify({'quiz': quiz}), 200
@@ -99,7 +70,6 @@ def get_quiz_detail(quiz_id):
 @quiz_bp.route('/api/quiz/<int:quiz_id>/attempted', methods=['GET'])
 @require_auth
 def check_attempted(quiz_id):
-    """GET /api/quiz/<quiz_id>/attempted — เช็คว่า user เคยทำ quiz นี้หรือยัง"""
     from db_config import get_connection
     
     conn = get_connection()
@@ -122,24 +92,6 @@ def check_attempted(quiz_id):
 @quiz_bp.route('/api/quiz/submit', methods=['POST'])
 @require_auth
 def submit_quiz():
-    """
-    POST /api/quiz/submit
-    รับคำตอบทั้งหมดหลังทำ Quiz เสร็จ
-
-    Body JSON:
-    {
-        "quiz_id": 1,
-        "time_spent": 420,
-        "answers": [
-            {
-                "question_id": 1,
-                "selected_choice": "B",
-                "response_time": 28.5,
-                "attempt_count": 1
-            }
-        ]
-    }
-    """
     from db_config import get_connection
     
     data = request.get_json() or {}
@@ -175,7 +127,3 @@ def submit_quiz():
     except Exception as e:
         logger.error('Failed to submit quiz: %s', str(e))
         return jsonify({'error': 'Failed to submit quiz'}), 500
-
-
-# ── helpers ────────────────────────────────────────────────────────────────
-# Note: Old code below is preserved but not in use (refactored to QuizService)

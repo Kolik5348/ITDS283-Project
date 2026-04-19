@@ -10,26 +10,26 @@
 
 USE learnflow;
 
--- ── Step 1: ล้างข้อมูลเก่าทั้งหมด ──────────────────────────────────────────
+--ล้างข้อมูลเก่าทั้งหมด
 SET FOREIGN_KEY_CHECKS = 0;
 
-TRUNCATE TABLE user_answers;   -- ขึ้นอยู่กับ quiz_attempts
-TRUNCATE TABLE quiz_attempts;  -- ขึ้นอยู่กับ users + quizzes
-TRUNCATE TABLE choices;        -- ขึ้นอยู่กับ questions
-TRUNCATE TABLE questions;      -- ขึ้นอยู่กับ quizzes
-TRUNCATE TABLE quizzes;        -- ขึ้นอยู่กับ subjects
+TRUNCATE TABLE user_answers;   
+TRUNCATE TABLE quiz_attempts;  
+TRUNCATE TABLE choices;        
+TRUNCATE TABLE questions;      
+TRUNCATE TABLE quizzes;        
 TRUNCATE TABLE subjects;
 
 SET FOREIGN_KEY_CHECKS = 1;
 
--- ── Step 2: ใส่ subjects ────────────────────────────────────────────────────
+--Step 2: ใส่ subjects
 INSERT INTO subjects (subject_name) VALUES
-('Mathematics'),    -- subject_id = 1
-('English'),        -- subject_id = 2
-('Social Studies'), -- subject_id = 3
-('Programming');    -- subject_id = 4
+('Mathematics'),    
+('English'),        
+('Social Studies'), 
+('Programming');    
 
--- ── Step 3: ใส่ quizzes ─────────────────────────────────────────────────────
+--Step 3: ใส่ quizzes
 INSERT INTO quizzes (subject_id, title, level, total_questions) VALUES
 -- Mathematics (subject_id = 1)
 (1, 'Math Basic',              'easy', 10),   -- quiz_id = 1

@@ -1,5 +1,5 @@
 USE learnflow;
--- 04_quiz_activity.sql  [FIXED + ADDED composite index]
+-- 04_quiz_activity.sql
 
 CREATE TABLE IF NOT EXISTS quiz_attempts (
     attempt_id      INT         NOT NULL AUTO_INCREMENT,
@@ -32,5 +32,5 @@ CREATE TABLE IF NOT EXISTS user_answers (
 CREATE INDEX idx_quiz_attempts_user_id   ON quiz_attempts (user_id);
 CREATE INDEX idx_quiz_attempts_date      ON quiz_attempts (attempt_date);
 CREATE INDEX idx_user_answers_attempt_id ON user_answers  (attempt_id);
--- ADD: composite index เพื่อ filter ข้อผิดเร็วขึ้นใน review และ analysis
+
 CREATE INDEX idx_user_answers_attempt_correct ON user_answers (attempt_id, is_correct);

@@ -1,15 +1,3 @@
-"""Result endpoint — retrieve quiz attempt results.
-
-Endpoints:
-- GET /api/result/<attempt_id> — ดึงผลลัพธ์ quiz attempt
-
-Features:
-- Grade calculation (A/B/C)
-- Badge emoji (EXCELLENT/GOOD/KEEP TRYING)
-- Performance breakdown (accuracy, speed, understanding)
-- Quiz metadata (title, subject)
-"""
-
 from flask import Blueprint, jsonify, g
 from db_config import get_connection
 from auth_middleware import require_auth
@@ -20,11 +8,6 @@ result_bp = Blueprint('result', __name__)
 @result_bp.route('/api/result/<int:attempt_id>', methods=['GET'])
 @require_auth
 def get_result(attempt_id):
-    """
-    GET /api/result/<attempt_id>
-    ดึงผลลัพธ์หลังทำ Quiz เสร็จ
-    Flutter ใช้แสดงหน้า ResultPage
-    """
     conn = get_connection()
     try:
         with conn.cursor() as cur:
@@ -84,11 +67,6 @@ def get_result(attempt_id):
 @result_bp.route('/api/review/<int:attempt_id>', methods=['GET'])
 @require_auth
 def get_review(attempt_id):
-    """
-    GET /api/review/<attempt_id>
-    ดึงคำตอบ + เฉลย + คำอธิบายทุกข้อ
-    Flutter ใช้แสดงหน้า ReviewAnswerPage
-    """
     conn = get_connection()
     try:
         with conn.cursor() as cur:

@@ -1,19 +1,3 @@
-"""Firebase authentication middleware — verify ID tokens on protected endpoints.
-
-Features:
-- Extracts Firebase ID Token from Authorization header
-- Verifies token with Firebase Admin SDK
-- Sets g.firebase_uid and g.email for use in endpoints
-- Handles token expiry and invalid token errors
-- Generic error messages (no internal details leaked)
-
-Usage:
-    @app.route('/api/protected')
-    @require_auth
-    def protected_endpoint():
-        user_id = g.firebase_uid
-        email = g.email
-"""
 
 from functools import wraps
 from flask import request, jsonify, g
@@ -24,11 +8,6 @@ logger = logging.getLogger(__name__)
 
 
 def require_auth(f):
-    """Decorator — verify Firebase ID Token จาก Authorization header
-    
-    Set: g.firebase_uid, g.email สำหรับใช้ใน endpoint
-    Return 401 ถ้า token ไม่ valid หรือ expired
-    """
     @wraps(f)
     def decorated(*args, **kwargs):
         # ดึง token จาก Header

@@ -1,15 +1,3 @@
-"""Authentication endpoints — user login and registration.
-
-Endpoints:
-- POST /api/auth/login — Sync Firebase user to MySQL (create if not exists)
-- POST /api/auth/register — Create new user with email/password
-
-Features:
-- Input validation (names, emails, auth providers)
-- Rate limiting (5 per minute on login)
-- Transaction safety with rollback on errors
-- Generic error messages (no credential leakage)
-"""
 
 from flask import Blueprint, request, jsonify, g, current_app
 from db_config import get_connection
@@ -21,15 +9,10 @@ auth_bp = Blueprint('auth', __name__)
 
 
 def _get_limiter():
-    """Helper to get limiter from current app"""
     return current_app.extensions.get('limiter')
 
 
 def _validate_name(name):
-    """ตรวจสอบชื่อ: string, 1-100 chars, ไม่มี special chars
-    
-    Return: None (valid) หรือ error message
-    """
     if not isinstance(name, str):
         return 'Name must be a string'
     name = name.strip()
@@ -41,10 +24,6 @@ def _validate_name(name):
 
 
 def _validate_email(email):
-    """ตรวจสอบ email: required, <= 255 chars, มี @ symbol
-    
-    Return: None (valid) หรือ error message
-    """
     if not email or not isinstance(email, str):
         return 'Email is required'
     if len(email) > 255:
@@ -57,12 +36,6 @@ def _validate_email(email):
 @auth_bp.route('/api/auth/login', methods=['POST'])
 @require_auth
 def login():
-    """
-    POST /api/auth/login
-    Flutter ส่ง Firebase ID Token มา → verify → sync user ลง MySQL
-    ถ้ายังไม่มี user → สร้างใหม่อัตโนมัติ (Google Login)
-    Rate limited to 5 per minute per IP
-    """
     data = request.get_json() or {}
     name = data.get('name', '').strip()
     auth_provider = data.get('auth_provider', 'google').strip()
@@ -141,11 +114,6 @@ def login():
 @auth_bp.route('/api/auth/register', methods=['POST'])
 @require_auth
 def register():
-    """
-    POST /api/auth/register
-    Flutter ส่ง Firebase ID Token + ข้อมูล user มา → สร้าง user ใหม่ลง MySQL
-    ใช้สำหรับ Email/Password Register
-    """
     data = request.get_json() or {}
     first_name = data.get('first_name', '').strip()
     last_name  = data.get('last_name', '').strip()

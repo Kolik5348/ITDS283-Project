@@ -1,4 +1,3 @@
-// lib/pages/Analyticspage.dart
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import '../services/analytics_service.dart';
@@ -29,7 +28,6 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
 
   List<Map<String, dynamic>> _barData    = [];
   Map<String, dynamic>       _radarData  = {};
-
   List<Map<String, dynamic>> _growthData = [];
 
   @override
@@ -59,7 +57,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
     try {
       final data = await AnalyticsService.getGrowth();
       setState(() {
-        _growthData     = List<Map<String, dynamic>>.from(data['growth'] ?? []);
+        _growthData      = List<Map<String, dynamic>>.from(data['growth'] ?? []);
         _isGrowthLoading = false;
       });
     } catch (_) {
@@ -75,6 +73,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
     }
   }
 
+  // Index 0 is a fixed origin point (0,0); actual data starts at index 1.
   List<FlSpot> get _growthSpots {
     const origin = FlSpot(0, 0);
     if (_growthData.isEmpty) return [origin, const FlSpot(1, 0)];
@@ -85,6 +84,9 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
     return [origin, ...dataSpots];
   }
 
+  // Returns a label for the x-axis tick at [idx].
+  // Index 0 is the origin — returns empty string.
+  // Thins out labels when there are many sessions (shows ~5 evenly spaced).
   String? _growthLabel(int idx) {
     if (idx == 0) return '';
     final dataIdx = idx - 1;
@@ -374,6 +376,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                 dotData: FlDotData(
                   show: true,
                   getDotPainter: (s, p, b, i) {
+                    // Hide dot on the synthetic origin point
                     if (i == 0) {
                       return FlDotCirclePainter(
                           radius: 0,
@@ -413,6 +416,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
             sectionsSpace: 2, centerSpaceRadius: 36,
             sections: [
               PieChartSectionData(
+                  // Fallback to value 1 so the chart renders when there's no data
                   value: total > 0 ? strong.toDouble() : 1,
                   color: primaryGreen, radius: 28, showTitle: false),
               PieChartSectionData(

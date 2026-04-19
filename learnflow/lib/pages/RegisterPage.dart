@@ -1,4 +1,4 @@
-// lib/pages/RegisterPage.dart  [FIXED]
+// lib/pages/RegisterPage.dart
 
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -25,7 +25,6 @@ class _RegisterPageState extends State<RegisterPage> {
   final _dobCtrl       = TextEditingController();
   final _phoneCtrl     = TextEditingController();
 
-  // วันเกิดในรูปแบบ YYYY-MM-DD สำหรับส่ง API
   String? _birthDateIso;
 
   @override
@@ -57,7 +56,7 @@ class _RegisterPageState extends State<RegisterPage> {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
   }
 
-  // ── Firebase Register + API sync ─────────────────────────────────────────
+  //Firebase Register + API sync
   Future<void> _register() async {
     if (_firstNameCtrl.text.trim().isEmpty ||
         _lastNameCtrl.text.trim().isEmpty  ||
@@ -90,21 +89,16 @@ class _RegisterPageState extends State<RegisterPage> {
       _showSnack(_firebaseMsg(e.code, e.message));
     } on ApiException catch (e) {
       debugPrint('API register warning: ${e.message}');
-      // Firebase user สร้างแล้ว ให้เข้าแอปได้
       if (mounted) Navigator.pushReplacementNamed(context, '/home');
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
   }
 
-  // ── Google Sign-In ────────────────────────────────────────────────────────
-  // FIX: Google บน RegisterPage ควรทำงานเหมือน Login (ไม่ใช่ register ใหม่)
-  // เพราะ Google account มักมีอยู่แล้ว และ Firebase จะ sign-in หรือ link อัตโนมัติ
+  //Google Sign-In
   Future<void> _signInWithGoogle() async {
     setState(() => _isGoogleLoading = true);
     try {
-      // FIX: signOut ก่อนทุกครั้งเพื่อให้ Google แสดง account picker
-      // หากไม่ทำ Google จะใช้ cached account โดยไม่แสดง picker
       final googleSignIn = GoogleSignIn();
       await googleSignIn.signOut();
 
@@ -120,16 +114,12 @@ class _RegisterPageState extends State<RegisterPage> {
         idToken:     googleAuth.idToken,
       );
 
-      // Firebase signInWithCredential — ถ้า account มีอยู่แล้วจะ sign in
-      // ถ้ายังไม่มีจะสร้างใหม่อัตโนมัติ
       final cred = await FirebaseAuth.instance.signInWithCredential(credential);
 
-      // Sync กับ MySQL (API จะ upsert ให้ ไม่ duplicate)
       await AuthService.syncGoogleLogin(cred.user?.displayName ?? '');
 
       if (mounted) Navigator.pushReplacementNamed(context, '/home');
     } on FirebaseAuthException catch (e) {
-      // FIX: handle กรณีที่ email นี้สมัครด้วย email/password แล้ว
       if (e.code == 'account-exists-with-different-credential') {
         _showSnack('This email is already registered with email/password. Please log in instead.');
       } else {
@@ -137,7 +127,6 @@ class _RegisterPageState extends State<RegisterPage> {
       }
     } on ApiException catch (e) {
       debugPrint('API sync warning: ${e.message}');
-      // Firebase login สำเร็จแล้ว ให้เข้าแอปได้
       if (mounted) Navigator.pushReplacementNamed(context, '/home');
     } catch (e) {
       _showSnack('Google sign-in failed. Please try again.');
@@ -162,7 +151,6 @@ class _RegisterPageState extends State<RegisterPage> {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            // Header
             Container(
               width: double.infinity,
               padding: const EdgeInsets.only(top: 60, left: 20, right: 20, bottom: 30),

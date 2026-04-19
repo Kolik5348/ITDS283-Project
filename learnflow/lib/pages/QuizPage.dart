@@ -1,5 +1,4 @@
 // lib/pages/QuizPage.dart  [FIXED UI]
-// แก้: ใช้ LearnFlowBottomNav กลางแทน copy
 
 import 'package:flutter/material.dart';
 import '../services/quiz_service.dart';
@@ -37,7 +36,6 @@ class _QuizPageState extends State<QuizPage> {
     try {
       final quizzes = await QuizService.getQuizzes();
 
-      // เก็บเฉพาะ subject/difficulty ที่ยังมีอยู่จริงใน quiz ที่โหลดมา
       final validSubjects = quizzes
           .map((q) => (q['subject_name'] ?? '').toString().toUpperCase())
           .toSet();
@@ -80,14 +78,12 @@ class _QuizPageState extends State<QuizPage> {
   bool get _hasActiveFilters =>
       _selectedSubjects.isNotEmpty || _selectedDifficulties.isNotEmpty;
 
-  // ดึง subjects ที่มีจริงใน quiz data
   List<String> get _availableSubjects => _quizzes
       .map((q) => (q['subject_name'] ?? '').toString().toUpperCase())
       .toSet()
       .toList()
     ..sort();
 
-  // ดึง difficulties ที่มีจริงใน quiz data (เรียงลำดับ EASY → MEDIUM → HARD)
   List<String> get _availableDifficulties {
     const order = ['EASY', 'MEDIUM', 'HARD'];
     final found = _quizzes
@@ -96,7 +92,6 @@ class _QuizPageState extends State<QuizPage> {
     return order.where((d) => found.contains(d)).toList();
   }
 
-  // config สีของแต่ละ difficulty
   Map<String, dynamic> _difficultyConfig(String level) {
     switch (level) {
       case 'EASY':
@@ -368,7 +363,6 @@ class _QuizPageState extends State<QuizPage> {
               ),
             ),
           ),
-          // FIX: ใช้ widget กลาง
           const LearnFlowBottomNav(selectedIndex: 1),
         ]),
       ),

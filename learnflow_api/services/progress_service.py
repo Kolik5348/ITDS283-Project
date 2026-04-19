@@ -9,11 +9,6 @@ def update_topic_analysis(cur, user_id: int, subject_id: int,
                            avg_speed: float,
                            subject_name: str = '',
                            understanding_scores_by_difficulty: dict = None):
-    """
-    คำนวณและอัปเดต topic_analysis พร้อม difficulty-based mastery
-    avg_speed คือค่าเฉลี่ย min(1.0, expected_time / response_time) รายข้อ
-    คำนวณแล้วจาก quiz.py ก่อนส่งเข้ามา
-    """
     accuracy      = round(correct / total, 4) if total > 0 else 0.0
     mastery       = calculate_topic_mastery(understanding_scores)
     understanding = round(sum(understanding_scores) / len(understanding_scores), 4) \
@@ -61,8 +56,6 @@ def update_topic_analysis(cur, user_id: int, subject_id: int,
 
 
 def update_progress(cur, user_id: int, understanding_scores: list):
-    """อัปเดต progress รายวัน — ถ้าวันนี้มีอยู่แล้ว ให้เฉลี่ยสะสม (rolling avg)
-    แทนการทับค่าเดิม เพื่อให้กราฟ Growth สะท้อนการเปลี่ยนแปลงทุก session"""
     today = date.today()
     new_avg = round(
         sum(understanding_scores) / len(understanding_scores), 4

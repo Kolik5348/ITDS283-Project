@@ -1,13 +1,3 @@
-"""Flask app factory — main entry point for LearnFlow API.
-
-Setup:
-- Initializes Firebase authentication
-- Sets up global rate limiting (Flask-Limiter)
-- Registers all route blueprints (auth, quiz, analysis, etc.)
-- Configures CORS and database connection pooling
-- Provides health check endpoint
-"""
-
 import sys
 import os
 import logging
@@ -42,10 +32,6 @@ limiter = Limiter(
 
 
 def setup_logging():
-    """ตั้งค่า logging กลาง — INFO ขึ้นไปแสดงใน console พร้อม timestamp
-    
-    ตัวอย่าง: [2025-04-18 10:30:45] INFO auth: Login successful
-    """
     logging.config.dictConfig({
         'version': 1,
         'disable_existing_loggers': False,
@@ -69,7 +55,6 @@ def setup_logging():
 
 
 def create_app():
-    """สร้าง Flask app instance พร้อม setup Firebase, CORS, Rate Limiting, DB Pooling"""
     setup_logging()
     logger = logging.getLogger(__name__)
 
@@ -117,7 +102,6 @@ def create_app():
     # Debug endpoint to list all registered routes
     @app.route('/api/debug/routes', methods=['GET'])
     def debug_routes():
-        """List all registered routes for debugging"""
         routes = []
         for rule in app.url_map.iter_rules():
             routes.append({

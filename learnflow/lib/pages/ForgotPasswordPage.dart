@@ -19,7 +19,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
     super.dispose();
   }
 
-  // ── Firebase Reset Password ───────────────────────────────────────────────
+  //Firebase Reset Password
   Future<void> _sendReset() async {
     if (_emailController.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(

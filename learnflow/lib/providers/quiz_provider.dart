@@ -1,14 +1,7 @@
 /// lib/providers/quiz_provider.dart
-/// Riverpod state management for quiz functionality
-///
-/// Providers:
-/// - quizzesProvider: Paginated quiz list
-/// - quizDetailProvider: Single quiz detail with questions
-/// - quizSubmissionProvider: Handle quiz submission state
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-/// State for paginated quizzes
 class QuizzesState {
   final List<dynamic> quizzes;
   final int page;
@@ -41,7 +34,6 @@ class QuizzesState {
   }
 }
 
-/// Provider for quiz list with pagination
 final quizzesProvider = StateNotifierProvider<
     QuizzesNotifier,
     QuizzesState>((ref) => QuizzesNotifier());
@@ -49,19 +41,9 @@ final quizzesProvider = StateNotifierProvider<
 class QuizzesNotifier extends StateNotifier<QuizzesState> {
   QuizzesNotifier() : super(QuizzesState());
 
-  /// Load quizzes for specific page
   Future<void> loadPage(int page) async {
     state = state.copyWith(isLoading: true);
     try {
-      // TODO: Call QuizService.getQuizzesPage(page)
-      // final result = await QuizService.getQuizzesPage(page: page, limit: 20);
-      // state = state.copyWith(
-      //   quizzes: result['quizzes'],
-      //   page: page,
-      //   totalPages: result['pagination']['total_pages'],
-      //   isLoading: false,
-      //   error: null,
-      // );
     } catch (e) {
       state = state.copyWith(
         isLoading: false,
@@ -70,19 +52,16 @@ class QuizzesNotifier extends StateNotifier<QuizzesState> {
     }
   }
 
-  /// Load more quizzes (infinite scroll)
   Future<void> loadMore() async {
     if (state.page >= state.totalPages) return;
     await loadPage(state.page + 1);
   }
 
-  /// Refresh quiz list
   Future<void> refresh() async {
     await loadPage(1);
   }
 }
 
-/// Provider for single quiz detail
 class QuizDetailState {
   final dynamic quiz;
   final bool isLoading;
@@ -107,7 +86,6 @@ class QuizDetailState {
   }
 }
 
-/// Family provider for quiz detail by ID
 final quizDetailProvider = StateNotifierProvider.family<
     QuizDetailNotifier,
     QuizDetailState,
@@ -123,13 +101,6 @@ class QuizDetailNotifier extends StateNotifier<QuizDetailState> {
   Future<void> loadDetail() async {
     state = state.copyWith(isLoading: true);
     try {
-      // TODO: Call QuizService.getQuizDetail(quizId)
-      // final quiz = await QuizService.getQuizDetail(quizId);
-      // state = state.copyWith(
-      //   quiz: quiz,
-      //   isLoading: false,
-      //   error: null,
-      // );
     } catch (e) {
       state = state.copyWith(
         isLoading: false,
@@ -139,7 +110,6 @@ class QuizDetailNotifier extends StateNotifier<QuizDetailState> {
   }
 }
 
-/// State for quiz submission
 class QuizSubmissionState {
   final bool isSubmitting;
   final bool success;
@@ -168,7 +138,6 @@ class QuizSubmissionState {
   }
 }
 
-/// Provider for quiz submission
 final quizSubmissionProvider = StateNotifierProvider<
     QuizSubmissionNotifier,
     QuizSubmissionState>((ref) => QuizSubmissionNotifier());
@@ -176,7 +145,6 @@ final quizSubmissionProvider = StateNotifierProvider<
 class QuizSubmissionNotifier extends StateNotifier<QuizSubmissionState> {
   QuizSubmissionNotifier() : super(QuizSubmissionState());
 
-  /// Submit quiz answers
   Future<void> submitAnswers({
     required int quizId,
     required int timeSpent,
@@ -184,17 +152,6 @@ class QuizSubmissionNotifier extends StateNotifier<QuizSubmissionState> {
   }) async {
     state = state.copyWith(isSubmitting: true);
     try {
-      // TODO: Call QuizService.submitQuiz()
-      // final result = await QuizService.submitQuiz(
-      //   quizId: quizId,
-      //   timeSpent: timeSpent,
-      //   answers: answers,
-      // );
-      // state = state.copyWith(
-      //   isSubmitting: false,
-      //   success: true,
-      //   result: result,
-      // );
     } catch (e) {
       state = state.copyWith(
         isSubmitting: false,
@@ -203,7 +160,6 @@ class QuizSubmissionNotifier extends StateNotifier<QuizSubmissionState> {
     }
   }
 
-  /// Reset submission state
   void reset() {
     state = QuizSubmissionState();
   }

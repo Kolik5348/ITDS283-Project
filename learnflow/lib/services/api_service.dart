@@ -1,12 +1,5 @@
 /// lib/services/api_service.dart
-/// Central HTTP client for all API communication
-/// 
-/// Features:
-/// - Firebase ID Token auto-refresh on every request
-/// - 15-second timeout per request
-/// - Exponential backoff retry (3 attempts: 500ms, 1s, 2s)
-/// - Smart retry: skip 4xx errors, retry 5xx + TimeoutException
-/// - Custom exception types: ApiException, TokenExpiredException
+
 
 import 'dart:async';
 import 'dart:convert';
@@ -14,18 +7,16 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:http/http.dart' as http;
 
 class ApiService {
-  // อ่าน baseUrl จาก --dart-define
-  // flutter run --dart-define=API_URL=http://192.168.x.x:5000
   static const String baseUrl = String.fromEnvironment(
     'API_URL',
     defaultValue: 'https://itds283-project-production.up.railway.app',
   );
 
-  static const Duration _timeout    = Duration(seconds: 60); // increased for Railway cold start
+  static const Duration _timeout    = Duration(seconds: 60);
   static const int      _maxRetries = 3;
   static const Duration _retryDelay = Duration(milliseconds: 500);
 
-  // ── Token helpers ──────────────────────────────────────────────────────────
+  //Token helpers
   static Future<String?> _getToken() async {
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) return null;
@@ -44,9 +35,7 @@ class ApiService {
     };
   }
 
-  // NOTE: CSRF removed — backend uses Firebase Auth (Bearer token) instead
-
-  // ── GET with Retry ─────────────────────────────────────────────────────────
+  //GET with Retry
   static Future<Map<String, dynamic>> get(String path) async {
     return _retryableRequest(
       () => _get(path),
@@ -63,7 +52,7 @@ class ApiService {
     return _handleResponse(response);
   }
 
-  // ── POST with Retry ────────────────────────────────────────────────────────
+  //POST with Retry
   static Future<Map<String, dynamic>> post(
       String path, Map<String, dynamic> body) async {
     return _retryableRequest(
@@ -76,7 +65,6 @@ class ApiService {
   static Future<Map<String, dynamic>> _post(
       String path, Map<String, dynamic> body) async {
     final headers = await _authHeaders();
-    // NOTE: CSRF token removed — not needed for mobile API with Firebase Auth
 
     final response = await http
         .post(
@@ -88,7 +76,7 @@ class ApiService {
     return _handleResponse(response);
   }
 
-  // ── Retry Logic ────────────────────────────────────────────────────────────
+  //Retry Logic
   static Future<Map<String, dynamic>> _retryableRequest(
     Future<Map<String, dynamic>> Function() request, {
     required String method,
@@ -106,18 +94,16 @@ class ApiService {
         }
         await Future.delayed(_retryDelay * attempts);
       } on ApiException catch (e) {
-        // ไม่ retry บน 4xx (client error)
         if (e.statusCode >= 400 && e.statusCode < 500) rethrow;
         attempts++;
         if (attempts >= _maxRetries) rethrow;
-        // Retry บน 5xx (server error): exponential backoff 500ms, 1s, 2s
         await Future.delayed(_retryDelay * attempts);
       }
     }
     throw ApiException('Request failed after retries', 0);
   }
 
-  // ── Response handler ───────────────────────────────────────────────────────
+  //Response handler
   static Map<String, dynamic> _handleResponse(http.Response response) {
     final decoded = jsonDecode(utf8.decode(response.bodyBytes));
     if (response.statusCode >= 200 && response.statusCode < 300) {
@@ -129,7 +115,7 @@ class ApiService {
   }
 }
 
-// ── Exceptions ─────────────────────────────────────────────────────────────
+//Exceptions
 
 class ApiException implements Exception {
   final String message;

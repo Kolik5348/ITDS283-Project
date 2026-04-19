@@ -1,5 +1,3 @@
-// lib/pages/ContactUsPage.dart  [UPDATED — ใส่รูป dev1.png / dev2.png]
-
 import 'package:flutter/material.dart';
 
 class ContactUsPage extends StatelessWidget {
@@ -59,7 +57,6 @@ class ContactUsPage extends StatelessWidget {
   Widget _buildDevCard(Map<String, dynamic> dev) {
     return Column(
       children: [
-        // Avatar — แสดงรูป dev1.png / dev2.png
         Container(
           width: 110,
           height: 130,
@@ -80,7 +77,6 @@ class ContactUsPage extends StatelessWidget {
 
         const SizedBox(height: 12),
 
-        // Name + Role
         Text(
           dev['name'] as String,
           style: const TextStyle(
@@ -98,7 +94,6 @@ class ContactUsPage extends StatelessWidget {
 
         const SizedBox(height: 14),
 
-        // Contact card
         Container(
           width: double.infinity,
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),

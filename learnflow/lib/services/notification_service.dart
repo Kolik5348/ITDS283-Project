@@ -11,7 +11,6 @@ class NotificationService {
       FlutterLocalNotificationsPlugin();
   static bool _initialized = false;
 
-  // Key สำหรับบันทึกสถานะการแจ้งเตือนลง SharedPreferences
   static const String _prefKey = 'notifications_enabled';
 
   static bool get _isSupported =>
@@ -40,7 +39,6 @@ class NotificationService {
     _initialized = true;
   }
 
-  /// ตรวจสอบว่า OS ให้ permission การแจ้งเตือนหรือยัง
   static Future<bool> hasPermission() async {
     if (!_isSupported) return false;
     if (defaultTargetPlatform == TargetPlatform.android) {
@@ -57,7 +55,6 @@ class NotificationService {
     return false;
   }
 
-  /// ขอ permission แล้วรอ return ว่าได้รับหรือไม่
   static Future<bool> requestPermission() async {
     if (!_isSupported) return false;
     if (defaultTargetPlatform == TargetPlatform.android) {
@@ -78,21 +75,17 @@ class NotificationService {
     return false;
   }
 
-  // ─── SharedPreferences: บันทึก/โหลด สถานะ ─────────────────────────────────
+  //SharedPreferences: บันทึก/โหลด สถานะ
 
-  /// บันทึกสถานะที่ผู้ใช้ตั้งไว้
   static Future<void> _saveEnabled(bool value) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(_prefKey, value);
   }
 
-  /// อ่านสถานะที่บันทึกไว้ (default = false)
   static Future<bool> loadEnabled() async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getBool(_prefKey) ?? false;
   }
-
-  // ──────────────────────────────────────────────────────────────────────────
 
   static Future<void> showNow({
     required int id,
@@ -122,12 +115,9 @@ class NotificationService {
     );
   }
 
-  /// Schedule + บันทึกสถานะลง prefs
-  /// Return true ถ้าสำเร็จ, false ถ้าไม่มี permission
   static Future<bool> scheduleDailyReminder() async {
     if (!_isSupported) return false;
 
-    // ตรวจ permission ก่อน schedule เสมอ
     final permitted = await hasPermission();
     if (!permitted) {
       await _saveEnabled(false);
@@ -163,12 +153,10 @@ class NotificationService {
       matchDateTimeComponents: DateTimeComponents.time,
     );
 
-    // บันทึกสถานะว่าเปิดอยู่
     await _saveEnabled(true);
     return true;
   }
 
-  // สำหรับ test notification ทันที (ขึ้นใน 5 วินาที)
   static Future<void> scheduleTestNotification() async {
     if (!_isSupported) return;
     final scheduled =
@@ -210,7 +198,6 @@ class NotificationService {
     );
   }
 
-  /// ยกเลิกทุก notification + บันทึกสถานะว่าปิดแล้ว
   static Future<void> cancelAll() async {
     if (!_isSupported) return;
     await _plugin.cancelAll();

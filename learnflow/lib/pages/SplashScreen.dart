@@ -41,11 +41,9 @@ class _SplashScreenState extends State<SplashScreen>
   }
 
   Future<void> _decideNavigation() async {
-    // รอ animation + Firebase init
     await Future.delayed(const Duration(seconds: 2));
     if (!mounted) return;
 
-    // รอ Firebase emit auth state จริง (timeout 3 วินาที)
     User? user;
     try {
       user = await FirebaseAuth.instance
@@ -59,18 +57,14 @@ class _SplashScreenState extends State<SplashScreen>
     if (!mounted) return;
 
     if (user == null) {
-      // ไม่มี session → ไป onboarding
       Navigator.pushReplacementNamed(context, '/onboarding');
       return;
     }
 
-    // FIX: มี Firebase session → ต้อง sync user ลง MySQL ก่อนเสมอ
-    // เพราะถ้า DB ถูกล้าง หรือ user ยังไม่เคย sync → /api/profile จะได้ 404
     try {
       final displayName = user.displayName ?? '';
       await AuthService.syncGoogleLogin(displayName);
     } on ApiException catch (e) {
-      // sync ล้มเหลว (server ไม่ตอบ / CSRF error) → ไม่ให้เข้าแอป
       debugPrint('Splash sync failed: ${e.message}');
       if (!mounted) return;
       _showRetryDialog();
@@ -83,7 +77,6 @@ class _SplashScreenState extends State<SplashScreen>
     }
 
     if (!mounted) return;
-    // Sync สำเร็จ → ไป home
     Navigator.pushReplacementNamed(context, '/home');
   }
 
@@ -98,7 +91,7 @@ class _SplashScreenState extends State<SplashScreen>
           TextButton(
             onPressed: () {
               Navigator.pop(context);
-              _decideNavigation(); // retry
+              _decideNavigation();
             },
             child: const Text('ลองใหม่'),
           ),
@@ -168,7 +161,7 @@ class _SplashScreenState extends State<SplashScreen>
   }
 }
 
-// ── Spinner ───────────────────────────────────────────────────────────────────
+//Spinner 
 
 class _GradientSpinner extends StatefulWidget {
   const _GradientSpinner();
